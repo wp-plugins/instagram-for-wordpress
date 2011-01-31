@@ -19,7 +19,9 @@ Requires PHP curl extension.
 
 == Installation ==
 
-1. Upload wpinstagram.php to 'wp-content/plugins/'.
+Installation as usual.
+
+1. Unzip and Upload all files to a sub directory in "/wp-content/plugins/".
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Add 'Instagram' widget to Your sidebar via 'Appearance' > 'Widgets' menu in WordPress.
 4. Enter url of one of Your Instagram photos in specified area to get Your Instagram's ID.
