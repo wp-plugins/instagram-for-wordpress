@@ -4,7 +4,7 @@ Donate link: https://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures
 
@@ -26,6 +26,10 @@ Requires PHP curl extension.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.1.4 =
+* fancybox, cycle, easing, mousewhell jquery plugins are now included in plugins package
+* changed way how jquery dependencies are loaded
 
 = 0.1.3 =
 * javascript now only loads if widget is activated
