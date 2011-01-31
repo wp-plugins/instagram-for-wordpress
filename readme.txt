@@ -27,6 +27,9 @@ Requires PHP curl extension.
 
 == Changelog ==
 
+= 0.1.3 =
+* javascript now only loads if widget is activated
+
 = 0.1.2 =
 * some changes to plugin info
 
