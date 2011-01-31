@@ -4,7 +4,7 @@ Donate link: https://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures
 
