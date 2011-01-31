@@ -27,6 +27,9 @@ Requires PHP curl extension.
 
 == Changelog ==
 
+= 0.1.2 =
+* some changes to plugin info
+
 = 0.1.1 =
 * Initial upload to WordPress plugin directory
 
