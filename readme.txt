@@ -4,14 +4,19 @@ Donate link: https://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.1.4
+Stable tag: 0.1.5
 
-Simple sidebar widget that shows Your latest 20 instagr.am pictures
+Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedded.
 
 == Description ==
 
-Simple sidebar widget that shows Your latest 20 instagr.am pictures.
-Requires PHP curl extension.
+Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedded. Requires PHP curl extension.
+To embed picture use [instagram] shortcode.
+Example:
+[instagram url='http://instagr.am/p/BSJRn/' size='large' addlink='no']
+
+Sizes are: large (612x612px), middle (306x306px) and small (150x150px).
+addlink='yes' encloses <img /> element with <a href='url'></a>
 
 == Screenshots ==
 
@@ -28,6 +33,9 @@ Installation as usual.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.1.5 =
+* initial support for [instagram] shortcode.
 
 = 0.1.4 =
 * fancybox, cycle, easing, mousewhell jquery plugins are now included in plugins package

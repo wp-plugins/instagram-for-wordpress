@@ -2,11 +2,55 @@
 /*
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
-	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures
-	Version: 0.1.4
+	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embeder.
+	Version: 0.1.5
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
+add_shortcode('instagram', 'instagram_embed_shortcode');
+
+function instagram_embed_shortcode($atts, $content = null){
+		
+	extract(shortcode_atts(array(
+		'url' => '',
+		'size' => 'middle',
+		'addlink' => 'yes'
+		), $atts));
+	
+	if(($url != '')&&(preg_match('/^http:\/\/instagr\.am\/p\/[a-zA-Z0-9-_]+\/$/', $url))) {
+		switch($size) {
+			case 'large':
+				$maxwidth = 612;
+				break;
+			case 'small':
+				$maxwidth = 150;
+				break;
+			case 'middle':
+			default:
+				$maxwidth = 306;
+				break;
+		}
+		$oembed_url = "http://instagr.am/api/v1/oembed/?url=".rawurlencode($url)."&maxwidth=".$maxwidth;
+		$ch = curl_init($oembed_url);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
+		$data = curl_exec($ch);
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if($httpcode >= 200 && $httpcode < 400){
+			$data = json_decode($data);
+			if($data->url){
+				$html = '<img src="'.$data->url.'"'.($data->title!=''?' alt="'.$data->title.'"':'').' width="'.$maxwidth.'" height="'.$maxwidth.'" />';
+				if($addlink == 'yes') {
+					return '<a href="'.$url.'"'.($data->title!=''?' title="'.$data->title.'"':'').'>'.$html.'</a>';
+				} else return $html;
+			}
+		}
+	}
+	return null;
+}
+
 add_action( 'widgets_init', 'load_wpinstagram' );
 function load_wpinstagram() {
 	register_widget( 'WPInstagram_Widget' );
