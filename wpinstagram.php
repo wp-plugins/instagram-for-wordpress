@@ -2,7 +2,7 @@
 /*
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
-	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embeder.
+	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
 	Version: 0.1.5
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
