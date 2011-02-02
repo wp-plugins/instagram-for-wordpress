@@ -1,4 +1,4 @@
-jQuery(function(){
+jQuery.noConflict()(function(){
 	jQuery("div.wpinstagram").cycle({fx: "fade"});
 	jQuery("div.wpinstagram").find("a").fancybox({
 		"transitionIn":			"elastic",
