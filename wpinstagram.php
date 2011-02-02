@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.2.1
+	Version: 0.2.2
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -75,44 +75,18 @@ class WPInstagram_Widget extends WP_Widget {
 			wp_enqueue_script("jquery");
 			wp_enqueue_script("jquery.cycle", $this->wpinstagram_path."/js/jquery.cycle-2.94.min.js", Array('jquery'), '2.94');
 			wp_enqueue_script("jquery.mousewhell", $this->wpinstagram_path."/js/jquery.mousewheel-3.0.4.pack.js", Array('jquery'), '3.0.4');
+			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."/wpinstagram.css", Array(), '0.2.2');
 			if( in_array( 'fancybox-for-wordpress/fancybox.php', (array) get_option( 'active_plugins', array() ) ) == false ) {
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."/js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), '1.3.4');
-				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."/js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."/js/fancybox/jquery.fancybox-1.3.4.css", Array(), '1.3.4');
-				add_action('wp_head', Array($this, 'instagram_add_js_with_fancybox'));
+				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."/js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
+				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram.js", Array('jquery', 'jquery.cycle', 'fancybox'), '0.2.2');
 			} else {
-				add_action('wp_head', Array($this, 'instagram_add_js'));
+				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram-without-fancybox.js", Array('jquery',  'jquery.cycle', 'fancybox'), '0.2.2');
 			}
 		}
 		
 	}
-
-	function instagram_add_js_with_fancybox(){
-?>
-		<script type="text/javascript">
-			jQuery.noConflict()(function(){
-				jQuery("div.wpinstagram").cycle({fx: "fade"});
-				jQuery("div.wpinstagram").find("a").fancybox({
-					"transitionIn":			"elastic",
-					"transitionOut":		"elastic",
-					"easingIn":				"easeOutBack",
-					"easingOut":			"easeInBack",
-					"titlePosition":		"over",
-					"padding":				0,
-					"hideOnContentClick":	"true"
-				});
-			});
-		</script>		
-<?php		}
-	function instagram_add_js(){
-?>
-		<script type="text/javascript">
-			jQuery.noConflict()(function(){
-				jQuery("div.wpinstagram").cycle({fx: "fade"});
-			});
-		</script>
-<?php	}
-
 
 	function widget( $args, $instance ) {
 		extract( $args );
@@ -130,9 +104,9 @@ class WPInstagram_Widget extends WP_Widget {
 				if($title){
 					echo $before_title.$title.$after_title;
 				}
-				echo '<div class="wpinstagram">';
+				echo '<ul class="wpinstagram">';
 				foreach($images as $image){
-					echo '<a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="wpinstagram">';
+					echo '<li><a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="wpinstagram">';
 					if($instance['customsize'] != ""){
 						if($instance['customsize'] <= 150){
 							echo '<img src="'.$image["image_small"].'" alt="'.$image['title'].'" width="'.$instance['customsize'].'" height="'.$instance['customsize'].'" />';
@@ -155,9 +129,9 @@ class WPInstagram_Widget extends WP_Widget {
 								break;
 						}
 					}
-					echo '</a>';
+					echo '</a></li>';
 				}
-				echo '</div>';
+				echo '</ul>';
 				echo $after_widget;
 			}
 		}
