@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.1.8
+	Version: 0.1.9
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -73,14 +73,37 @@ class WPInstagram_Widget extends WP_Widget {
 		if( is_active_widget( '', '', 'wpinstagram-widget' ) ) {
 			$this->wpinstagram_path = get_bloginfo('wpurl').'/'.Str_Replace("\\", '/', SubStr(RealPath(DirName(__FILE__)), Strlen(ABSPATH)));
 			wp_enqueue_script("jquery");
+			wp_enqueue_script("jquery.cycle", $this->wpinstagram_path."/js/jquery.cycle-2.94.min.js", Array('jquery'), '2.94');
+			wp_enqueue_script("jquery.mousewhell", $this->wpinstagram_path."/js/jquery.mousewheel-3.0.4.pack.js", Array('jquery'), '3.0.4');
 			if( in_array( 'fancybox-for-wordpress/fancybox.php', (array) get_option( 'active_plugins', array() ) ) == false ) {
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."/js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), '1.3.4');
 				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."/js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."/js/fancybox/jquery.fancybox-1.3.4.css", Array(), '1.3.4');
+				add_action('wp_head', function(){ ?>
+					<script type="text/javascript">
+						jQuery.noConflict()(function(){
+							jQuery("div.wpinstagram").cycle({fx: "fade"});
+							jQuery("div.wpinstagram").find("a").fancybox({
+								"transitionIn":			"elastic",
+								"transitionOut":		"elastic",
+								"easingIn":				"easeOutBack",
+								"easingOut":			"easeInBack",
+								"titlePosition":		"over",
+								"padding":				0,
+								"hideOnContentClick":	"true"
+							});
+						});
+					</script>
+				<?php });
+			} else {
+				add_action('wp_head', function(){ ?>
+					<script type="text/javascript">
+						jQuery.noConflict()(function(){
+							jQuery("div.wpinstagram").cycle({fx: "fade"});
+						});
+					</script>
+				<?php });
 			}
-			wp_enqueue_script("jquery.cycle", $this->wpinstagram_path."/js/jquery.cycle-2.94.min.js", Array('jquery'), '2.94');
-			wp_enqueue_script("jquery.mousewhell", $this->wpinstagram_path."/js/jquery.mousewheel-3.0.4.pack.js", Array('jquery'), '3.0.4');
-			wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram.js", Array('jquery', 'fancybox'));
 		}
 		
 	}
