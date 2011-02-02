@@ -16,7 +16,7 @@ Example:
 [instagram url='http://instagr.am/p/BSJRn/' size='large' addlink='no']
 
 Sizes are: large (612x612px), middle (306x306px) and small (150x150px).
-addlink='yes' encloses <img /> element with <a href='url'></a>
+addlink='yes' encloses img element with a element.
 
 == Screenshots ==
 
