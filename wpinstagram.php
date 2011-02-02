@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.1.9
+	Version: 0.2
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -79,34 +79,40 @@ class WPInstagram_Widget extends WP_Widget {
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."/js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), '1.3.4');
 				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."/js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."/js/fancybox/jquery.fancybox-1.3.4.css", Array(), '1.3.4');
-				add_action('wp_head', function(){ ?>
-					<script type="text/javascript">
-						jQuery.noConflict()(function(){
-							jQuery("div.wpinstagram").cycle({fx: "fade"});
-							jQuery("div.wpinstagram").find("a").fancybox({
-								"transitionIn":			"elastic",
-								"transitionOut":		"elastic",
-								"easingIn":				"easeOutBack",
-								"easingOut":			"easeInBack",
-								"titlePosition":		"over",
-								"padding":				0,
-								"hideOnContentClick":	"true"
-							});
-						});
-					</script>
-				<?php });
+				add_action('wp_head', Array($this, 'instagram_add_js'));
 			} else {
-				add_action('wp_head', function(){ ?>
-					<script type="text/javascript">
-						jQuery.noConflict()(function(){
-							jQuery("div.wpinstagram").cycle({fx: "fade"});
-						});
-					</script>
-				<?php });
+				add_action('wp_head', Array($this, 'instagram_add_js_with_fancybox'));
 			}
 		}
 		
 	}
+
+	function instagram_add_js_with_fancybox(){
+?>
+		<script type="text/javascript">
+			jQuery.noConflict()(function(){
+				jQuery("div.wpinstagram").cycle({fx: "fade"});
+				jQuery("div.wpinstagram").find("a").fancybox({
+					"transitionIn":			"elastic",
+					"transitionOut":		"elastic",
+					"easingIn":				"easeOutBack",
+					"easingOut":			"easeInBack",
+					"titlePosition":		"over",
+					"padding":				0,
+					"hideOnContentClick":	"true"
+				});
+			});
+		</script>		
+<?php		}
+	function instagram_add_js(){
+?>
+		<script type="text/javascript">
+			jQuery.noConflict()(function(){
+				jQuery("div.wpinstagram").cycle({fx: "fade"});
+			});
+		</script>
+<?php	}
+
 
 	function widget( $args, $instance ) {
 		extract( $args );
