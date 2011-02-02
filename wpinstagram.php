@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.2
+	Version: 0.2.1
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -79,9 +79,9 @@ class WPInstagram_Widget extends WP_Widget {
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."/js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), '1.3.4');
 				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."/js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."/js/fancybox/jquery.fancybox-1.3.4.css", Array(), '1.3.4');
-				add_action('wp_head', Array($this, 'instagram_add_js'));
-			} else {
 				add_action('wp_head', Array($this, 'instagram_add_js_with_fancybox'));
+			} else {
+				add_action('wp_head', Array($this, 'instagram_add_js'));
 			}
 		}
 		
