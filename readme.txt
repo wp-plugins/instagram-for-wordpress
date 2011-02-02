@@ -4,7 +4,7 @@ Donate link: https://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.1.5
+Stable tag: 0.1.6
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
 
@@ -33,6 +33,10 @@ Installation as usual.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.1.6 =
+* added widget size options - Instagrams original sizes & custom size
+* added "flattr this" link to WordPress plugins' area
 
 = 0.1.5 =
 * initial support for [instagram] shortcode.

@@ -3,12 +3,20 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.1.5
+	Version: 0.1.6
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
-add_shortcode('instagram', 'instagram_embed_shortcode');
+add_filter('plugin_row_meta', 'instagram_add_flattr_link', 10, 2);
+function instagram_add_flattr_link($links, $file){
+	$plugin = plugin_basename(__FILE__);
+	if($file == $plugin){
+		$links[] = '<a href="http://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget" target="_blank">Flattr this</a>';	
+	}
+	return $links;
+}
 
+add_shortcode('instagram', 'instagram_embed_shortcode');
 function instagram_embed_shortcode($atts, $content = null){
 		
 	extract(shortcode_atts(array(
@@ -79,6 +87,7 @@ class WPInstagram_Widget extends WP_Widget {
 		extract( $args );
 		$title = apply_filters('widget_title', $instance['title']);
 		$id = $instance['id'];
+
 		if($id){
 			$images = wp_cache_get('instagrams', 'wpinstagram_cache');
 			if(false == $images) {
@@ -92,9 +101,30 @@ class WPInstagram_Widget extends WP_Widget {
 				}
 				echo '<div class="wpinstagram">';
 				foreach($images as $image){
-					echo '<a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="wpinstagram">'
-						.'<img src="'.$image["image_small"].'" alt="'.$image['title'].'" width="150" height="150" />'
-						.'</a>';
+					echo '<a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="wpinstagram">';
+					if($instance['customsize'] != ""){
+						if($instance['customsize'] <= 150){
+							echo '<img src="'.$image["image_small"].'" alt="'.$image['title'].'" width="'.$instance['customsize'].'" height="'.$instance['customsize'].'" />';
+						} elseif($instance['customsize'] <= 306 && $instance['customsize'] > 150){
+							echo '<img src="'.$image["image_middle"].'" alt="'.$image['title'].'" width="'.$instance['customsize'].'" height="'.$instance['customsize'].'" />';
+						} elseif($instance['customsize'] > 306){
+							echo '<img src="'.$image["image_large"].'" alt="'.$image['title'].'" width="'.$instance['customsize'].'" height="'.$instance['customsize'].'" />';
+						}
+					} else {
+						switch($instance['size']){
+							case 'large':
+								echo '<img src="'.$image["image_large"].'" alt="'.$image['title'].'" width="612" height="612" />';
+								break;
+							case 'middle':
+								echo '<img src="'.$image["image_middle"].'" alt="'.$image['title'].'" width="306" height="306" />';
+								break;
+							case 'small':
+							default:
+								echo '<img src="'.$image["image_small"].'" alt="'.$image['title'].'" width="150" height="150" />';
+								break;
+						}
+					}
+					echo '</a>';
 				}
 				echo '</div>';
 				echo $after_widget;
@@ -151,6 +181,13 @@ class WPInstagram_Widget extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['id'] = strip_tags( $new_instance['id'] );
+		$instance['size'] = strip_tags( $new_instance['size'] );
+		$instance['customsize'] = strip_tags( $new_instance['customsize'] );
+		
+		if(!intval($instance['customsize'])){
+			$instance['customsize'] = "";
+		}
+		
 		if($new_instance['singleinstagram'] != ""){
 			$idcheck = $this->instagram_get_pk($new_instance['singleinstagram']);
 			if(is_wp_error($idcheck)){
@@ -164,19 +201,32 @@ class WPInstagram_Widget extends WP_Widget {
 	}
 	
 	function form( $instance ) {
-		$defaults = array( 'title' => __('My instagrams', 'wpinstagram'), 'id' => __('', 'wpinstagram') );
+		$defaults = array( 'title' => __('My instagrams', 'wpinstagram'), 'id' => __('', 'wpinstagram'), 'size' => __('small', 'wpinstagram'), 'customsize' => __('', 'wpinstagram') );
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 		<p>
 			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'hybrid'); ?></label>
 			<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" class="widefat" />
 		</p>
 		<p>
+			<label for="<?php echo $this->get_field_id( 'size' ); ?>"><?php _e('Picture size:', 'wpinstagram'); ?></label>
+			<select id="<?php echo $this->get_field_id( 'size' ); ?>" name="<?php echo $this->get_field_name( 'size' ); ?>">
+				<option value="small"<?php echo ($instance['size']=='small'?' selected':''); ?>>small (150x150px)</option>
+				<option value="middle"<?php echo ($instance['size']=='middle'?' selected':''); ?>>middle (306x306px)</option>
+				<option value="large"<?php echo ($instance['size']=='large'?' selected':''); ?>>large (612x612px)</option>
+			</select>
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'customsize' ); ?>"><?php _e('.. or custom picture size:', 'wpinstagram'); ?>
+				<input id="<?php echo $this->get_field_id( 'customsize' ); ?>" name="<?php echo $this->get_field_name( 'customsize' ); ?>" type="text" size="3" value="<?php echo $instance['customsize']; ?>" /> px
+			</label>
+		</p>
+		<p>
 			<label for="<?php echo $this->get_field_id( 'id' ); ?>"><?php _e('Instagram ID:', 'wpinstagram'); ?></label>
-			<input id="<?php echo $this->get_field_id( 'id' ); ?>" name="<?php echo $this->get_field_name( 'id' ); ?>" value="<?php echo $instance['id']; ?>" class="widefat" />
+			<input id="<?php echo $this->get_field_id( 'id' ); ?>" name="<?php echo $this->get_field_name( 'id' ); ?>" type="text" value="<?php echo $instance['id']; ?>" class="widefat" />
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id( 'singleinstagram' ); ?>"><?php _e('To get Instagram ID, enter url of one of Your instagrams:', 'wpinstagram'); ?></label>
-			<input id="<?php echo $this->get_field_id( 'singleinstagram' ); ?>" name="<?php echo $this->get_field_name( 'singleinstagram' ); ?>" value="<?php echo $instance['singleinstagram']; ?>" class="widefat" placeholder="http://instagr.am/p/../" />
+			<input id="<?php echo $this->get_field_id( 'singleinstagram' ); ?>" name="<?php echo $this->get_field_name( 'singleinstagram' ); ?>" type="text" value="<?php echo $instance['singleinstagram']; ?>" class="widefat" placeholder="http://instagr.am/p/../" />
 		</p>
 	<?php
 	}
