@@ -4,7 +4,7 @@ Donate link: https://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
 
@@ -34,7 +34,7 @@ Installation as usual.
 
 == Changelog ==
 
-= 0.2.2 =
+= 0.2.3 =
 * jQuery code moved outside of wpinstagram.php
 * container element changed from div to ul, li
 
