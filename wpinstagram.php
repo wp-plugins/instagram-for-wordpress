@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.2.4
+	Version: 0.2.5
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -11,7 +11,8 @@ add_filter('plugin_row_meta', 'instagram_add_flattr_link', 10, 2);
 function instagram_add_flattr_link($links, $file){
 	$plugin = plugin_basename(__FILE__);
 	if($file == $plugin){
-		$links[] = '<a href="http://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget" target="_blank">Flattr this</a>';	
+		$links[] = '<a href="http://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget" target="_blank">Flattr this</a>';
+		$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8" targer="_blank">Donate</a>';
 	}
 	return $links;
 }
@@ -75,14 +76,14 @@ class WPInstagram_Widget extends WP_Widget {
 			wp_enqueue_script("jquery");
 			wp_enqueue_script("jquery.cycle", $this->wpinstagram_path."/js/jquery.cycle-2.94.min.js", Array('jquery'), '2.94');
 			wp_enqueue_script("jquery.mousewhell", $this->wpinstagram_path."/js/jquery.mousewheel-3.0.4.pack.js", Array('jquery'), '3.0.4');
-			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."/wpinstagram.css", Array(), '0.2.4');
+			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."/wpinstagram.css", Array(), '0.2.5');
 			if( in_array( 'fancybox-for-wordpress/fancybox.php', (array) get_option( 'active_plugins', array() ) ) == false ) {
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."/js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), '1.3.4');
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."/js/fancybox/jquery.fancybox-1.3.4.css", Array(), '1.3.4');
 				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."/js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
-				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram.js", Array('jquery', 'jquery.cycle', 'fancybox'), '0.2.4');
+				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram.js", Array('jquery', 'jquery.cycle', 'fancybox'), '0.2.5');
 			} else {
-				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram-without-fancybox.js", Array('jquery',  'jquery.cycle'), '0.2.4');
+				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."/js/wpinstagram-without-fancybox.js", Array('jquery',  'jquery.cycle'), '0.2.5');
 			}
 		}
 		
