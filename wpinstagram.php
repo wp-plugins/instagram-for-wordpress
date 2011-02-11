@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.2.5
+	Version: 0.2.6
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -41,7 +41,9 @@ function instagram_embed_shortcode($atts, $content = null){
 		}
 		$oembed_url = "http://instagr.am/api/v1/oembed/?url=".rawurlencode($url)."&maxwidth=".$maxwidth;
 		$ch = curl_init($oembed_url);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		if(ini_get("open_basedir") == ""){
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		}
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
@@ -93,12 +95,16 @@ class WPInstagram_Widget extends WP_Widget {
 		extract( $args );
 		$title = apply_filters('widget_title', $instance['title']);
 		$id = $instance['id'];
+		$cacheduration = $instance['cacheduration'];
+		if(!intval($cacheduration) || $cacheduration == ""){
+			$cacheduration = 3600;
+		}
 
 		if($id){
-			$images = wp_cache_get('instagrams', 'wpinstagram_cache');
+			$images = wp_cache_get('instagrams_'.$id, 'wpinstagram_cache');
 			if(false == $images) {
 				$images = $this->instagram_get_latest($instance);
-				wp_cache_set('instagrams', $images, 'wpinstagram_cache', 3600);
+				wp_cache_set('instagrams_'.$id, $images, 'wpinstagram_cache', $cacheduration);
 			}
 			if(!empty($images)){
 				echo $before_widget;
@@ -140,7 +146,9 @@ class WPInstagram_Widget extends WP_Widget {
 	
 	function instagram_get_pk($url){
 		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		if(ini_get("open_basedir") == ""){
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		}
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
@@ -160,7 +168,9 @@ class WPInstagram_Widget extends WP_Widget {
 		$images = array();
 		if(intval($instance['id'])){
 			$ch = curl_init("http://instagr.am/api/v1/feed/user/".$instance['id']."/");
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+			if(ini_get("open_basedir") == ""){
+				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+			}
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
@@ -189,9 +199,13 @@ class WPInstagram_Widget extends WP_Widget {
 		$instance['id'] = strip_tags( $new_instance['id'] );
 		$instance['size'] = strip_tags( $new_instance['size'] );
 		$instance['customsize'] = strip_tags( $new_instance['customsize'] );
+		$instance['cacheduration'] = strip_tags( $new_instance['cacheduration'] );
 		
 		if(!intval($instance['customsize'])){
 			$instance['customsize'] = "";
+		}
+		if(!intval($instance['cacheduration'])){
+			$instance['cacheduration'] = 3600;
 		}
 		
 		if($new_instance['singleinstagram'] != ""){
@@ -207,7 +221,7 @@ class WPInstagram_Widget extends WP_Widget {
 	}
 	
 	function form( $instance ) {
-		$defaults = array( 'title' => __('My instagrams', 'wpinstagram'), 'id' => __('', 'wpinstagram'), 'size' => __('small', 'wpinstagram'), 'customsize' => __('', 'wpinstagram') );
+		$defaults = array( 'title' => __('My instagrams', 'wpinstagram'), 'id' => __('', 'wpinstagram'), 'size' => __('small', 'wpinstagram'), 'customsize' => __('', 'wpinstagram'), 'cacheduration' => __('3600', 'wpinstagram') );
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 		<p>
 			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'hybrid'); ?></label>
@@ -233,6 +247,10 @@ class WPInstagram_Widget extends WP_Widget {
 		<p>
 			<label for="<?php echo $this->get_field_id( 'singleinstagram' ); ?>"><?php _e('To get Instagram ID, enter url of one of Your instagrams:', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id( 'singleinstagram' ); ?>" name="<?php echo $this->get_field_name( 'singleinstagram' ); ?>" type="text" value="<?php echo $instance['singleinstagram']; ?>" class="widefat" placeholder="http://instagr.am/p/../" />
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'cacheduration' ); ?>"><?php _e('Cache duration (in seconds, default 3600):', 'wpinstagram'); ?></label>
+			<input type="text" name="<?php echo $this->get_field_name( 'cacheduration' ); ?>" id="<?php echo $this->get_field_id( 'cacheduration' ); ?>" value="<?php echo $instance['cacheduration'];?>" />
 		</p>
 	<?php
 	}
