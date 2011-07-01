@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.2.6
+	Version: 0.2.7
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -46,7 +46,7 @@ function instagram_embed_shortcode($atts, $content = null){
 		}
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.18.17 (iPhone; iPhone OS 4.3.2; lv_LV)");
 		$data = curl_exec($ch);
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if($httpcode >= 200 && $httpcode < 400){
@@ -151,7 +151,7 @@ class WPInstagram_Widget extends WP_Widget {
 		}
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.18.17 (iPhone; iPhone OS 4.3.2; lv_LV)");
 		$data = curl_exec($ch);
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if($httpcode >= 200 && $httpcode < 400){
@@ -173,7 +173,7 @@ class WPInstagram_Widget extends WP_Widget {
 			}
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.12.1 (iPhone; iPhone OS 4.2.1; lv_LV)");
+			curl_setopt($ch, CURLOPT_USERAGENT, "Instagram 1.18.17 (iPhone; iPhone OS 4.3.2; lv_LV)");
 			$data = curl_exec($ch);
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			if($httpcode >= 200 && $httpcode < 400){
