@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.2.6
+Stable tag: 0.2.7
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
 
@@ -33,6 +33,9 @@ Installation as usual.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.2.7 =
+* Updated Instagram iPhone app version number. Apparently they are checking it.
 
 = 0.2.6 =
 * open_basedir check
