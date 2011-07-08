@@ -3,7 +3,7 @@ Contributors: Esemono
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8
 Tags: widgets, photos, instagram
 Requires at least: 3.0
-Tested up to: 3.1
+Tested up to: 3.2
 Stable tag: 0.2.7
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
