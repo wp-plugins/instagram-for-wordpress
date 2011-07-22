@@ -1,3 +1,3 @@
-jQuery.noConflict()(function(){
-	jQuery("ul.wpinstagram").cycle({fx: "fade"});
+jQuery(document).ready(function($) {
+	$("ul.wpinstagram").cycle({fx: "fade"});
 });
