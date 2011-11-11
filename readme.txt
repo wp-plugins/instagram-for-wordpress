@@ -3,8 +3,8 @@ Contributors: Esemono
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8
 Tags: widgets, photos, instagram
 Requires at least: 3.0
-Tested up to: 3.2
-Stable tag: 0.2.7
+Tested up to: 3.2.1
+Stable tag: 0.3.1
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
 
@@ -21,6 +21,7 @@ addlink='yes' encloses img element with a element.
 == Screenshots ==
 
 1. Setup view in WordPress administration panel ( Appearance > Widgets )
+2. Setup view in WordPress administration panel ( Appearance > Widgets )
 
 == Installation ==
 
@@ -29,10 +30,17 @@ Installation as usual.
 1. Unzip and Upload all files to a sub directory in "/wp-content/plugins/".
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Add 'Instagram' widget to Your sidebar via 'Appearance' > 'Widgets' menu in WordPress.
-4. Enter url of one of Your Instagram photos in specified area to get Your Instagram's ID.
+4. Enter Your Instagram login details and click Save to get Instagram access.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.3.1 =
+* cache fix
+* moved to wp_remote_post & wp_remote_get
+
+= 0.3 =
+* Migrated to xAuth. After installation/update users will have to enter their Instagram login details (will be used only to get access token from Instagram and will not be saved or sent to someone else other than Instagram).
 
 = 0.2.7 =
 * Updated Instagram iPhone app version number. Apparently they are checking it.
@@ -84,13 +92,7 @@ Installation as usual.
 = 0.1.1 =
 * Initial upload to WordPress plugin directory
 
-== Frequently Asked Questions ==
-
-= Do this plugin uses Instagram's unpublished API? =
-
-Currently yes. Hopefully Instagram will release its API to public soon.
-
 == Upgrade Notice ==
 
-= 0.1 =
-Initial upload to WordPress plugin directory
+= 0.3 =
+After installation/update users will have to enter their Instagram login details (will be used only to get access token from Instagram and will not be saved or sent to someone else other than Instagram).
