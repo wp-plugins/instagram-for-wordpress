@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 0.3
+Stable tag: 0.3.1
 
 Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
 
@@ -21,6 +21,7 @@ addlink='yes' encloses img element with a element.
 == Screenshots ==
 
 1. Setup view in WordPress administration panel ( Appearance > Widgets )
+2. Setup view in WordPress administration panel ( Appearance > Widgets )
 
 == Installation ==
 
@@ -33,6 +34,10 @@ Installation as usual.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.3.1 =
+* cache fix
+* moved to wp_remote_post & wp_remote_get
 
 = 0.3 =
 * Migrated to xAuth. After installation/update users will have to enter their Instagram login details (will be used only to get access token from Instagram and will not be saved or sent to someone else other than Instagram).
