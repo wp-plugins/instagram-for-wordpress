@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.3.1
+	Version: 0.3.2
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -71,14 +71,14 @@ class WPInstagram_Widget extends WP_Widget {
 			wp_enqueue_script("jquery");
 			wp_enqueue_script("jquery.cycle", $this->wpinstagram_path."js/jquery.cycle-2.94.min.js", Array('jquery'), '2.94');
 			wp_enqueue_script("jquery.mousewhell", $this->wpinstagram_path."js/jquery.mousewheel-3.0.4.pack.js", Array('jquery'), '3.0.4');
-			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."wpinstagram.css", Array(), '0.3.1');
+			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."wpinstagram.css", Array(), '0.3.2');
 			if(in_array('fancybox-for-wordpress/fancybox.php',(array)get_option('active_plugins',array()))==false):
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), '1.3.4');
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."js/fancybox/jquery.fancybox-1.3.4.css", Array(), '1.3.4');
 				wp_enqueue_script("jquery.easing", $this->wpinstagram_path."js/jquery.easing-1.3.pack.js", Array('jquery'), '1.3');
-				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."js/wpinstagram.js", Array('jquery', 'jquery.cycle', 'fancybox'), '0.3.1');
+				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."js/wpinstagram.js", Array('jquery', 'jquery.cycle', 'fancybox'), '0.3.2');
 			else:
-				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."js/wpinstagram-without-fancybox.js", Array('jquery',  'jquery.cycle'), '0.3.1');
+				wp_enqueue_script("wpinstagram", $this->wpinstagram_path."js/wpinstagram-without-fancybox.js", Array('jquery',  'jquery.cycle'), '0.3.2');
 			endif;
 		endif;
 
@@ -139,14 +139,16 @@ class WPInstagram_Widget extends WP_Widget {
 	}
 
 	function instagram_login($login, $pass){
-		$response = wp_remote_post("https://api.instagram.com/oauth/access_token", array(
+		$response = wp_remote_post("https://api.instagram.com/oauth/access_token",
+			array(
 				'body' => array(
 					'username' => $login,
 					'password' => $pass,
 					'grant_type' => 'password',
 					'client_id' => '90c2afb9762041138b620eb56710ca39',
 					'client_secret' => 'c605ec6443e348e68643470fdc3ef02a'
-				)
+				),
+				'sslverify' => apply_filters('https_local_ssl_verify', false)
 			)
 		);
 		if(!is_wp_error($response) && $response['response']['code'] < 400 && $response['response']['code'] >= 200):
@@ -164,7 +166,11 @@ class WPInstagram_Widget extends WP_Widget {
 	function instagram_get_latest($instance){
 		$images = array();
 		if($instance['access_token'] != null):
-			$response = wp_remote_get("https://api.instagram.com/v1/users/self/media/recent?access_token=".$instance['access_token']);
+			$response = wp_remote_get("https://api.instagram.com/v1/users/self/media/recent?access_token=".$instance['access_token'],
+				array(
+					'sslverify' => apply_filters('https_local_ssl_verify', false)
+				)
+			);
 			if(!is_wp_error($response) && $response['response']['code'] < 400 && $response['response']['code'] >= 200):
 				$data = json_decode($response['body']);
 				if($data->meta->code == 200):
