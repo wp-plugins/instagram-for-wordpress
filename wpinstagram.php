@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.3.3
+	Version: 0.3.5
 	Author: Eriks Remess
 	Author URI: http://twitter.com/EriksRemess
 */
@@ -87,7 +87,7 @@ class WPInstagram_Widget extends WP_Widget {
 			wp_enqueue_script("jquery");
 			wp_enqueue_script("jquery.easing", $this->wpinstagram_path."js/jquery.easing-1.3.pack.js", Array('jquery'), null);
 			wp_enqueue_script("jquery.cycle", $this->wpinstagram_path."js/jquery.cycle.lite-1.5.min.js", Array('jquery'), null);
-			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."wpinstagram.css", Array(), '0.3.3');
+			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."wpinstagram.css", Array(), '0.3.5');
 			if($withfancybox):
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), null);
 				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."js/fancybox/jquery.fancybox-1.3.4.min.css", Array(), null);
@@ -234,6 +234,8 @@ jQuery(document).ready(function($) {
 		endif;
 		if(preg_match("/[a-zA-Z0-9_\-]+/i", $new_instance['hashtag'])):
 			$instance['hashtag'] = $new_instance['hashtag'];
+		else:
+			unset($instance['hashtag']);
 		endif;
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['size'] = strip_tags($new_instance['size']);
@@ -302,7 +304,7 @@ jQuery(document).ready(function($) {
 		</p>
 		<?php else: ?>
 		<p>
-			<label for="<?php echo $this->get_field_id('hashtag'); ?>"><?php _e('Show latest public instagrams with following hashtag (without "#"):', 'wpinstagram'); ?></label>
+			<label for="<?php echo $this->get_field_id('hashtag'); ?>"><?php _e('Show latest public instagrams with following hashtag (without "#"; if empty, will show your recent instagrams):', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id('hashtag'); ?>" name="<?php echo $this->get_field_name('hashtag'); ?>" type="text" value="<?php echo $instance['hashtag'];?>" class="widefat" />
 		</p>
 		<p>
