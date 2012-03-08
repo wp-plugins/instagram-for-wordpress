@@ -79,7 +79,7 @@ class WPInstagram_Widget extends WP_Widget {
 		else:
 			$withfancybox = false;
 		endif;
-		$widget_ops = array('description' => __('Displays latest 20 instagrams.', 'wpinstagram'), 'withfancybox' => $withfancybox);
+		$widget_ops = array('description' => __('Displays latest instagrams.', 'wpinstagram'), 'withfancybox' => $withfancybox);
 		$control_ops = array('width' => 300, 'height' => 350, 'id_base' => 'wpinstagram-widget');
 		$this->WP_Widget('wpinstagram-widget', __('Instagram', 'wpinstagram'), $widget_ops, $control_ops);
 		if(is_active_widget('','','wpinstagram-widget')&&!is_admin()):
@@ -149,7 +149,7 @@ class WPInstagram_Widget extends WP_Widget {
 ?>
 <script>
 jQuery(document).ready(function($) {
-	$("li#<?php echo $this->id; ?> ul").cycle({fx: "fade", timeout: <?php echo $cycletimeout; ?>});
+	$("#<?php echo $this->id; ?> ul").cycle({fx: "fade", timeout: <?php echo $cycletimeout; ?>});
 });
 </script>
 <?php				echo $after_widget;
@@ -183,7 +183,12 @@ jQuery(document).ready(function($) {
 	function instagram_get_latest($instance){
 		$images = array();
 		if($instance['access_token'] != null):
-			$response = wp_remote_get("https://api.instagram.com/v1/users/self/media/recent?count=".$instance['count']."&access_token=".$instance['access_token'],
+			if(isset($instance['hashtag']) && trim($instance['hashtag']) != "" && preg_match("/[a-zA-Z0-9_\-]+/i", $instance['hashtag'])):
+				$apiurl = "https://api.instagram.com/v1/tags/".$instance['hashtag']."/media/recent?count=".$instance['count']."&access_token=".$instance['access_token'];
+			else:
+				$apiurl = "https://api.instagram.com/v1/users/self/media/recent?count=".$instance['count']."&access_token=".$instance['access_token'];
+			endif;
+			$response = wp_remote_get($apiurl,
 				array(
 					'sslverify' => apply_filters('https_local_ssl_verify', false)
 				)
@@ -192,8 +197,15 @@ jQuery(document).ready(function($) {
 				$data = json_decode($response['body']);
 				if($data->meta->code == 200):
 					foreach($data->data as $item):
+						if(isset($instance['hashtag'], $item->caption->text)):
+							$image_title = $item->user->username.': &quot;'.filter_var($item->caption->text, FILTER_SANITIZE_STRING).'&quot;';
+						elseif(isset($instance['hashtag']) && !isset($item->caption->text)):
+							$image_title = "instagram by ".$item->user->username;
+						else:
+							$image_title = filter_var($item->caption->text, FILTER_SANITIZE_STRING);
+						endif;
 						$images[] = array(
-							"title" => (isset($item->caption->text)?filter_var($item->caption->text, FILTER_SANITIZE_STRING):""),
+							"title" => $image_title,
 							"image_small" => $item->images->thumbnail->url,
 							"image_middle" => $item->images->low_resolution->url,
 							"image_large" => $item->images->standard_resolution->url
@@ -217,8 +229,11 @@ jQuery(document).ready(function($) {
 			$instance['access_token'] = $auth->access_token;
 			$instance['login'] = $auth->user->username;
 		endif;
-		if($new_instance['count'] != $old_instance['count']):
+		if(($new_instance['count'] != $old_instance['count'])||($new_instance['hashtag'] != $instance['hashtag'])):
 			wp_cache_delete($this->id, 'wpinstagram_cache');
+		endif;
+		if(preg_match("/[a-zA-Z0-9_\-]+/i", $new_instance['hashtag'])):
+			$instance['hashtag'] = $new_instance['hashtag'];
 		endif;
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['size'] = strip_tags($new_instance['size']);
@@ -241,6 +256,7 @@ jQuery(document).ready(function($) {
 			'cacheduration' => __('3600', 'wpinstagram'),
 			'login' => __('', 'wpinstagram'),
 			'pass' => __('', 'wpinstagram'),
+			'hashtag' => __('', 'wpinstagram'),
 			'dologout' => __('0', 'wpinstagram'),
 			'count' => __('20', 'wpinstagram')
 		);
@@ -285,6 +301,10 @@ jQuery(document).ready(function($) {
 			<input id="<?php echo $this->get_field_id('pass'); ?>" name="<?php echo $this->get_field_name('pass'); ?>" type="password" class="widefat" />
 		</p>
 		<?php else: ?>
+		<p>
+			<label for="<?php echo $this->get_field_id('hashtag'); ?>"><?php _e('Show latest public instagrams with following hashtag (without "#"):', 'wpinstagram'); ?></label>
+			<input id="<?php echo $this->get_field_id('hashtag'); ?>" name="<?php echo $this->get_field_name('hashtag'); ?>" type="text" value="<?php echo $instance['hashtag'];?>" class="widefat" />
+		</p>
 		<p>
 			<input type="hidden" value="0" name="<?php echo $this->get_field_name('dologout'); ?>" id="<?php echo $this->get_field_id('dologout'); ?>" />
 			<label for="<?php echo $this->get_field_id('logoutbutton'); ?>"><?php _e('Logged in as: ', 'wpinstagram'); echo $instance['login']; ?></label>
