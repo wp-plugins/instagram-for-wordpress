@@ -3,14 +3,14 @@ Contributors: Esemono
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8
 Tags: widgets, photos, instagram
 Requires at least: 3.0
-Tested up to: 3.3
-Stable tag: 0.3.2
+Tested up to: 3.2.1
+Stable tag: 0.3.3
 
-Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
+Simple sidebar widget that shows Your latest instagr.am pictures and picture embedder.
 
 == Description ==
 
-Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder. Requires PHP curl extension.
+Simple sidebar widget that shows Your latest instagr.am pictures and picture embedder. Requires PHP curl extension.
 To embed picture use [instagram] shortcode.
 Example:
 [instagram url='http://instagr.am/p/BSJRn/' size='large' addlink='no']
@@ -35,8 +35,10 @@ Installation as usual.
 
 == Changelog ==
 
-= 0.3.2 =
-* disabled SSL certificate verification, as some hosts have SSL problems
+= 0.3.3 =
+* fix for multiple widgets (thanks for bug report @kirbotica!)
+* now possible to change cycle speed and number of latest instagrams
+* cleanup and updates of 3rd party jQuery plugins
 
 = 0.3.1 =
 * cache fix
