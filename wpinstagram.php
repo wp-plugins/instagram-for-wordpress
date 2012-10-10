@@ -3,19 +3,20 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.3.5
-	Author: Eriks Remess
-	Author URI: http://twitter.com/EriksRemess
+	Version: 0.3.6
+	Author: jbenders
+	Author URI: http://ink361.com/
 */
-add_filter('plugin_row_meta', 'instagram_add_flattr_link', 10, 2);
+/*add_filter('plugin_row_meta', 'instagram_add_flattr_link', 10, 2);
 function instagram_add_flattr_link($links, $file){
 	$plugin = plugin_basename(__FILE__);
-	if($file == $plugin):
-		$links[] = '<a href="http://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget" target="_blank">Flattr this</a>';
-		$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8" targer="_blank">Donate</a>';
-	endif;
+	//if($file == $plugin):
+		//$links[] = '<a href="http://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget" target="_blank">Flattr this</a>';
+		//$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8" targer="_blank">Donate</a>';
+	//endif;
 	return $links;
 }
+*/
 add_shortcode('instagram', 'instagram_embed_shortcode');
 function instagram_embed_shortcode($atts, $content = null){
 	extract(shortcode_atts(array(
@@ -59,6 +60,12 @@ function load_wpinstagram_footer(){
 ?>
 <script>
 	jQuery(document).ready(function($) {
+		$("ul.wpinstagram").find("a").each(function(i, e) {
+			e = $(e);
+			e.attr('data-href', e.attr('href'));
+			e.attr('href', e.attr('data-original'));
+		});
+
 		$("ul.wpinstagram").find("a").fancybox({
 			"transitionIn":			"elastic",
 			"transitionOut":		"elastic",
@@ -66,8 +73,28 @@ function load_wpinstagram_footer(){
 			"easingOut":			"easeInBack",
 			"titlePosition":		"over",
 			"padding":				0,
-			"hideOnContentClick":	"true"
+			"hideOnContentClick":	"false",
+			"type":					"image",
+			titleFormat: 			function(x, y, z) {
+
+				var html = '<div id="fancybox-title-over">';
+
+				if (x && x.length > 0) {
+					html += x + ' - ';
+				}
+
+				html += '<a href="http://beta.ink361.com/">Instagram</a> web interface</div>';
+				return html;
+			}
 		});
+
+		jQuery('#fancybox-content').live('click', function(x) {
+
+			var src = $(this).find('img').attr('src');
+			var a = $("ul.wpinstagram").find('a[href="' + src + '"]').attr('data-user-url');
+
+			window.open(a, '_blank');
+		})
 	});
 </script>
 <?php
@@ -141,7 +168,8 @@ class WPInstagram_Widget extends WP_Widget {
 				echo '<ul class="wpinstagram" style="width: '.$imagesize.'px; height: '.$imagesize.'px;">';
 				foreach($images as $image):
 					$imagesrc = $image[$imagetype];
-					echo '<li><a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'">';
+					//echo '<li><a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'">';
+					echo '<li><a href="http://beta.ink361.com/p/'.$image['id'].'" data-user-url="http://beta.ink361.com/#/photo/'.$image['id'].'" data-original="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'">';
 					echo '<img src="'.$imagesrc.'" alt="'.$image['title'].'" width="'.$imagesize.'" height="'.$imagesize.'" />';
 					echo '</a></li>';
 				endforeach;
@@ -163,12 +191,22 @@ jQuery(document).ready(function($) {
 					'username' => $login,
 					'password' => $pass,
 					'grant_type' => 'password',
+					//'client_id' => 'a9782be870bf41b5a5134962b951600f',
+					//'client_secret' => '82b23846e6e4432b8e2ad44bdc126ba1',
 					'client_id' => '90c2afb9762041138b620eb56710ca39',
 					'client_secret' => 'c605ec6443e348e68643470fdc3ef02a'
 				),
 				'sslverify' => apply_filters('https_local_ssl_verify', false)
 			)
 		);
+		/*
+		ob_start();
+		var_dump($response);
+		$contents = ob_get_contents();
+		ob_end_clean();
+		error_log($contents);
+		*/
+
 		if(!is_wp_error($response) && $response['response']['code'] < 400 && $response['response']['code'] >= 200):
 			$auth = json_decode($response['body']);
 			if(isset($auth->access_token)):
@@ -205,6 +243,7 @@ jQuery(document).ready(function($) {
 							$image_title = filter_var($item->caption->text, FILTER_SANITIZE_STRING);
 						endif;
 						$images[] = array(
+							"id" => $item->id,
 							"title" => $image_title,
 							"image_small" => $item->images->thumbnail->url,
 							"image_middle" => $item->images->low_resolution->url,

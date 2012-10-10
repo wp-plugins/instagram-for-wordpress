@@ -1,10 +1,9 @@
 === Instagram for WordPress ===
-Contributors: Esemono
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8
+Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 0.3.5
+Stable tag: 0.3.6
 
 Simple sidebar widget that shows Your latest instagr.am pictures and picture embedder.
 
@@ -34,6 +33,9 @@ Installation as usual.
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.3.6 =
+* added links to website
 
 = 0.3.5 =
 * bugfix
