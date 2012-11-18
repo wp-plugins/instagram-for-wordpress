@@ -3,7 +3,7 @@ Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 0.3.6
+Stable tag: 0.4
 
 Simple sidebar widget that shows Your latest instagr.am pictures and picture embedder.
 
@@ -29,10 +29,15 @@ Installation as usual.
 1. Unzip and Upload all files to a sub directory in "/wp-content/plugins/".
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Add 'Instagram' widget to Your sidebar via 'Appearance' > 'Widgets' menu in WordPress.
-4. Enter Your Instagram login details and click Save to get Instagram access.
+4. Follow the instructions for creating your own client for instagram
+5. Enter the newly created details into the widget
 5. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.4 =
+* changed authentication details, own client_id required now
+* added centering of widget
 
 = 0.3.6 =
 * added links to website
