@@ -3,20 +3,17 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.3.6
+	Version: 0.4
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
-/*add_filter('plugin_row_meta', 'instagram_add_flattr_link', 10, 2);
-function instagram_add_flattr_link($links, $file){
-	$plugin = plugin_basename(__FILE__);
-	//if($file == $plugin):
-		//$links[] = '<a href="http://flattr.com/thing/124992/Instagr-am-WordPress-sidebar-widget" target="_blank">Flattr this</a>';
-		//$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QBQQ8CTBF24C8" targer="_blank">Donate</a>';
-	//endif;
-	return $links;
+
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php');
+
+if(!defined('INSTAGRAM_PLUGIN_URL')) {
+  define('INSTAGRAM_PLUGIN_URL', plugins_url() . '/' . basename(dirname(__FILE__)));
 }
-*/
+
 add_shortcode('instagram', 'instagram_embed_shortcode');
 function instagram_embed_shortcode($atts, $content = null){
 	extract(shortcode_atts(array(
@@ -53,6 +50,13 @@ function instagram_embed_shortcode($atts, $content = null){
 	return null;
 }
 add_action('widgets_init', 'load_wpinstagram');
+add_option('instagram-widget-client_id', null, false, false);
+add_option('instagram-widget-client_secret', null, false, false);
+add_option('instagram-widget-access_token', null, false, true);
+add_option('instagram-widget-username', null, false, false);
+add_option('instagram-widget-picture', null, false, false);
+add_option('instagram-widget-fullname', null, false, false);
+
 function load_wpinstagram() {
 	register_widget('WPInstagram_Widget');
 }
@@ -128,6 +132,9 @@ class WPInstagram_Widget extends WP_Widget {
 		$title = apply_filters('widget_title', $instance['title']);
 		$cacheduration = (!intval($instance['cacheduration'])||$instance['cacheduration'] == "")?3600:$instance['cacheduration'];
 		$cycletimeout = (!intval($instance['cycletimeout'])||$instance['cycletimeout'] == "")?4000:$instance['cycletimeout'];
+		$instance['access_token'] = get_option('instagram-widget-access_token');
+		$instance['client_id'] = get_option('instagram-widget-client_id');
+		$instance['client_secret'] = get_option('instagram-widget-client_secret');
 		if(isset($instance['access_token'])):
 			$images = wp_cache_get($this->id, 'wpinstagram_cache');
 			if(false == $images):
@@ -140,7 +147,7 @@ class WPInstagram_Widget extends WP_Widget {
 					echo $before_title.$title.$after_title;
 				endif;
 				if($instance['customsize'] != ""):
-					$imagesize = $instance['customsize'];
+					$imagesize = intval($instance['customsize']);
 					if($imagesize <= 150):
 						$imagetype = "image_small";
 					elseif($imagesize <= 306 && $imagesize > 150):
@@ -165,10 +172,13 @@ class WPInstagram_Widget extends WP_Widget {
 							break;
 					endswitch;
 				endif;
-				echo '<ul class="wpinstagram" style="width: '.$imagesize.'px; height: '.$imagesize.'px;">';
+				$cls = 'wpinstagram';
+				if ($instance['centered']):
+					$cls .= ' centered';
+				endif;
+				echo '<ul class="'.$cls .'" style="width: '.$imagesize.'px; height: '.$imagesize.'px;">';
 				foreach($images as $image):
 					$imagesrc = $image[$imagetype];
-					//echo '<li><a href="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'">';
 					echo '<li><a href="http://beta.ink361.com/p/'.$image['id'].'" data-user-url="http://beta.ink361.com/#/photo/'.$image['id'].'" data-original="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'">';
 					echo '<img src="'.$imagesrc.'" alt="'.$image['title'].'" width="'.$imagesize.'" height="'.$imagesize.'" />';
 					echo '</a></li>';
@@ -180,49 +190,38 @@ jQuery(document).ready(function($) {
 	$("#<?php echo $this->id; ?> ul").cycle({fx: "fade", timeout: <?php echo $cycletimeout; ?>});
 });
 </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['ig._setAccount', 'UA-24509885-5']);
+  _gaq.push(['ig._setDomainName', 'plugin.ink361.com']);
+  _gaq.push(['ig._trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 <?php				echo $after_widget;
 			endif;
 		endif;
 	}
 	function instagram_login($login, $pass){
-		$response = wp_remote_post("https://api.instagram.com/oauth/access_token",
-			array(
-				'body' => array(
-					'username' => $login,
-					'password' => $pass,
-					'grant_type' => 'password',
-					//'client_id' => 'a9782be870bf41b5a5134962b951600f',
-					//'client_secret' => '82b23846e6e4432b8e2ad44bdc126ba1',
-					'client_id' => '90c2afb9762041138b620eb56710ca39',
-					'client_secret' => 'c605ec6443e348e68643470fdc3ef02a'
-				),
-				'sslverify' => apply_filters('https_local_ssl_verify', false)
-			)
-		);
-		/*
-		ob_start();
-		var_dump($response);
-		$contents = ob_get_contents();
-		ob_end_clean();
-		error_log($contents);
-		*/
-
-		if(!is_wp_error($response) && $response['response']['code'] < 400 && $response['response']['code'] >= 200):
-			$auth = json_decode($response['body']);
-			if(isset($auth->access_token)):
-				return $auth;
-			else:
-				return null;
-			endif;
-		else:
-			return null;
-		endif;
+		$redirect_uri = INSTAGRAM_PLUGIN_URL . '/authenticationhandler.php';
+		return $redirect_uri;
 	}
+
 	function instagram_get_latest($instance){
 		$images = array();
 		if($instance['access_token'] != null):
 			if(isset($instance['hashtag']) && trim($instance['hashtag']) != "" && preg_match("/[a-zA-Z0-9_\-]+/i", $instance['hashtag'])):
-				$apiurl = "https://api.instagram.com/v1/tags/".$instance['hashtag']."/media/recent?count=".$instance['count']."&access_token=".$instance['access_token'];
+				$hashtag = $instance['hashtag'];
+				if (substr($hashtag, 0, 1) == '#'):
+					$hashtag = substr($hashtag, 1);
+				endif;
+				$apiurl = "https://api.instagram.com/v1/tags/".$hashtag."/media/recent?count=".$instance['count']."&access_token=".$instance['access_token'];
 			else:
 				$apiurl = "https://api.instagram.com/v1/users/self/media/recent?count=".$instance['count']."&access_token=".$instance['access_token'];
 			endif;
@@ -257,16 +256,18 @@ jQuery(document).ready(function($) {
 	}
 	function update($new_instance, $old_instance){
 		$instance = $old_instance;
+		$loggedout = false;
 		if(isset($new_instance['dologout']) && $new_instance['dologout'] == 1):
+			$loggedout = true;
 			$instance['access_token'] = null;
 			$instance['login'] = null;
+			delete_option('instagram-widget-access_token');
 			wp_cache_delete($this->id, 'wpinstagram_cache');
 		endif;
-		if(isset($new_instance['login'], $new_instance['pass']) && trim($new_instance['login']) != "" && trim($new_instance['pass']) != ""):
+		if(isset($new_instance['client_id'], $new_instance['client_secret']) && !$loggedout && 
+				trim($new_instance['client_id']) != "" && trim($new_instance['client_secret']) != ""):
 			wp_cache_delete($this->id, 'wpinstagram_cache');
-			$auth = $this->instagram_login($new_instance['login'], $new_instance['pass']);
-			$instance['access_token'] = $auth->access_token;
-			$instance['login'] = $auth->user->username;
+			$auth = $this->instagram_login($new_instance['client_id'], $new_instance['client_secret']);
 		endif;
 		if(($new_instance['count'] != $old_instance['count'])||($new_instance['hashtag'] != $instance['hashtag'])):
 			wp_cache_delete($this->id, 'wpinstagram_cache');
@@ -284,10 +285,27 @@ jQuery(document).ready(function($) {
 		$instance['count'] = strip_tags($new_instance['count']);
 		$instance['customsize'] = intval($instance['customsize'])?$instance['customsize']:"";
 		$instance['count'] = intval($instance['count'])?$instance['count']:20;
+		$instance['centered'] = intval($new_instance['centered'])==1?true:false;
 		$instance['cycletimeout'] = intval($instance['cycletimeout'])?$instance['cycletimeout']:4000;
 		$instance['cacheduration'] = intval($instance['cacheduration'])?$instance['cacheduration']:3600;
+		$instance['client_id'] = strip_tags($new_instance['client_id']);
+		$instance['client_secret'] = strip_tags($new_instance['client_secret']);
+		$instance['loggedout'] = $loggedout;
+		
+		if (!$loggedout):
+			$instance['access_token'] = get_option('instagram-widget-access_token');
+		endif;
+
+		if (isset($auth)):
+			$instance['redirecturi'] = $auth;
+		endif;
+
+		update_option('instagram-widget-client_id', $instance['client_id']);
+		update_option('instagram-widget-client_secret', $instance['client_secret']);
+	
 		return $instance;
 	}
+
 	function form($instance ) {
 		$defaults = array(
 			'title' => __('My instagrams', 'wpinstagram'),
@@ -295,14 +313,30 @@ jQuery(document).ready(function($) {
 			'customsize' => __('', 'wpinstagram'),
 			'cycletimeout' => __('4000', 'wpinstagram'),
 			'cacheduration' => __('3600', 'wpinstagram'),
-			'login' => __('', 'wpinstagram'),
-			'pass' => __('', 'wpinstagram'),
+			'client_id' => __('', 'wpinstagram'),
+			'client_secret' => __('', 'wpinstagram'),
 			'hashtag' => __('', 'wpinstagram'),
 			'dologout' => __('0', 'wpinstagram'),
-			'count' => __('20', 'wpinstagram')
+			'count' => __('20', 'wpinstagram'),
+			'centered' => __('false', 'wpinstagram'),
 		);
 		$instance = wp_parse_args((array)$instance, $defaults);
-		?>
+		$instance['access_token'] = get_option('instagram-widget-access_token');
+		$hasaccesstoken = isset($instance['access_token']) && strlen($instance['access_token']) > 0;
+		
+		if (!$instance['loggedout'] && isset($instance['redirecturi']) && 
+				!$hasaccesstoken && $_SERVER['REQUEST_METHOD'] == 'POST') {
+			?>
+			<script type="text/javascript">
+				var url = 'https://api.instagram.com/oauth/authorize/' 
+					+ '?redirect_uri=' + encodeURIComponent("<?php echo $instance['redirecturi']; ?>")
+					+ '&response_type=code' 
+					+ '&client_id=a9782be870bf41b5a5134962b951600f'
+					+ '&display=touch';
+
+				window.open(url, 'wp-instagram-authentication-' + Math.random(), 'height=500,width=600');
+			</script>
+		<?php } ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $instance['title']; ?>" class="widefat" />
@@ -329,19 +363,35 @@ jQuery(document).ready(function($) {
 			<input type="text" name="<?php echo $this->get_field_name('cacheduration'); ?>" id="<?php echo $this->get_field_id('cacheduration'); ?>" value="<?php echo $instance['cacheduration'];?>" size="6" />
 		</p>
 		<p>
-		<label for="<?php echo $this->get_field_id('cycletimeout'); ?>"><?php _e('Cycle timeout (in miliseconds, default 4000):', 'wpinstagram'); ?></label>
+			<label for="<?php echo $this->get_field_id('cycletimeout'); ?>"><?php _e('Cycle timeout (in miliseconds, default 4000):', 'wpinstagram'); ?></label>
 			<input type="text" name="<?php echo $this->get_field_name('cycletimeout'); ?>" id="<?php echo $this->get_field_id('cycletimeout'); ?>" value="<?php echo $instance['cycletimeout'];?>" size="6" />
 		</p>
-		<?php if(!isset($instance['access_token'])): ?>
 		<p>
-			<label for="<?php echo $this->get_field_id('login'); ?>"><?php _e('Instagram username:', 'wpinstagram'); ?></label>
-			<input id="<?php echo $this->get_field_id('login'); ?>" name="<?php echo $this->get_field_name('login'); ?>" type="text" value="" class="widefat" />
+			<label for="<?php echo $this->get_field_id('centered'); ?>"><?php _e('Center widget:', 'wpinstagram'); ?></label>
+			<input type="checkbox" name="<?php echo $this->get_field_name('centered'); ?>" id="<?php echo $this->get_field_id('centered'); ?>" <?php if ($instance['centered']) { echo 'checked'; } ?> value="1" size="6" />
+		</p>
+
+		<p>
+			<label for="<?php echo $this->get_field_id('client_id'); ?>"><?php _e('Instagram client_id:', 'wpinstagram'); ?></label>
+			<input id="<?php echo $this->get_field_id('client_id'); ?>" name="<?php echo $this->get_field_name('client_id'); ?>" type="text" value="<?php echo $instance['client_id'];?>" class="widefat" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id('pass'); ?>"><?php _e('Password:', 'wpinstagram'); ?></label>
-			<input id="<?php echo $this->get_field_id('pass'); ?>" name="<?php echo $this->get_field_name('pass'); ?>" type="password" class="widefat" />
+			<label for="<?php echo $this->get_field_id('client_secret'); ?>"><?php _e('Client_secret:', 'wpinstagram'); ?></label>
+			<input id="<?php echo $this->get_field_id('client_secret'); ?>" name="<?php echo $this->get_field_name('client_secret'); ?>" type="text" value="<?php echo $instance['client_secret'];?>" class="widefat" />
+		</p>
+		<?php if(!isset($instance['access_token']) || strlen($instance['access_token']) == 0): ?>
+		<p>
+			Need help registering an instagram client? 
+			<a href="<?php echo INSTAGRAM_PLUGIN_URL . '/instructions.php'; ?>" onclick="window.open(this.href, Math.random(), 'height=500,width=600'); return false"> 
+				See these instructions 
+			</a>.
+			You need to allow pop-ups for this page to have this functionality work
 		</p>
 		<?php else: ?>
+		<p>
+			<label for="<?php echo $this->get_field_id('access_token'); ?>"><?php _e('Access_token:', 'wpinstagram'); ?></label>
+			<span><?php echo $instance['access_token'];?></span>
+		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('hashtag'); ?>"><?php _e('Show latest public instagrams with following hashtag (without "#"; if empty, will show your recent instagrams):', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id('hashtag'); ?>" name="<?php echo $this->get_field_name('hashtag'); ?>" type="text" value="<?php echo $instance['hashtag'];?>" class="widefat" />

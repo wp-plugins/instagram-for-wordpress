@@ -14,3 +14,7 @@ ul.wpinstagram li:first-child {
 	display: block;
 }
 
+ul.wpinstagram.centered {
+	margin: 0 auto !important;
+}
+
