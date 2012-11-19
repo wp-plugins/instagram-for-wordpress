@@ -35,6 +35,9 @@ Installation as usual.
 
 == Changelog ==
 
+= 0.4.1 =
+* fixed client_id bug
+
 = 0.4 =
 * changed authentication details, own client_id required now
 * added centering of widget

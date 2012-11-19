@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.4
+	Version: 0.4.1
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
@@ -98,7 +98,7 @@ function load_wpinstagram_footer(){
 			var a = $("ul.wpinstagram").find('a[href="' + src + '"]').attr('data-user-url');
 
 			window.open(a, '_blank');
-		})
+		});
 	});
 </script>
 <?php
@@ -331,7 +331,7 @@ jQuery(document).ready(function($) {
 				var url = 'https://api.instagram.com/oauth/authorize/' 
 					+ '?redirect_uri=' + encodeURIComponent("<?php echo $instance['redirecturi']; ?>")
 					+ '&response_type=code' 
-					+ '&client_id=a9782be870bf41b5a5134962b951600f'
+					+ '&client_id=<?php echo $instance["client_id"]; ?>'
 					+ '&display=touch';
 
 				window.open(url, 'wp-instagram-authentication-' + Math.random(), 'height=500,width=600');
