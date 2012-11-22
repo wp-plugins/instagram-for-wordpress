@@ -63,7 +63,7 @@ if(!defined('INSTAGRAM_PLUGIN_URL')) {
 
 			<dl>
 				<dt>Application name</dt>
-				<dd>Name of your websites</dd>
+				<dd>Name of your website</dd>
 				
 				<dt>Description</dt>
 				<dd>Instagram wordpress plugin</dd>

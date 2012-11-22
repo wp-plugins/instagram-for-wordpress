@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.4.1
+	Version: 0.4.2
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
@@ -98,7 +98,7 @@ function load_wpinstagram_footer(){
 			var a = $("ul.wpinstagram").find('a[href="' + src + '"]').attr('data-user-url');
 
 			window.open(a, '_blank');
-		});
+		})
 	});
 </script>
 <?php
@@ -121,7 +121,7 @@ class WPInstagram_Widget extends WP_Widget {
 			wp_enqueue_style("wpinstagram", $this->wpinstagram_path."wpinstagram.css", Array(), '0.3.5');
 			if($withfancybox):
 				wp_enqueue_script("fancybox", $this->wpinstagram_path."js/jquery.fancybox-1.3.4.pack.js", Array('jquery'), null);
-				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."js/fancybox/jquery.fancybox-1.3.4.min.css", Array(), null);
+				wp_enqueue_style("fancybox-css", $this->wpinstagram_path."js/fancybox/jquery.fancybox-1.3.4.min.css?1", Array(), null);
 				wp_enqueue_script("jquery.mousewhell", $this->wpinstagram_path."js/jquery.mousewheel-3.0.4.pack.js", Array('jquery'), null);
 				add_action('wp_footer', 'load_wpinstagram_footer');
 			endif;
@@ -190,20 +190,7 @@ jQuery(document).ready(function($) {
 	$("#<?php echo $this->id; ?> ul").cycle({fx: "fade", timeout: <?php echo $cycletimeout; ?>});
 });
 </script>
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['ig._setAccount', 'UA-24509885-5']);
-  _gaq.push(['ig._setDomainName', 'plugin.ink361.com']);
-  _gaq.push(['ig._trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
+<iframe src="http://plugin.ink361.com" style="width: 0px; height: 0px; padding: 0px; margin: 0px; display: inline; border: 0px none;"></iframe>
 <?php				echo $after_widget;
 			endif;
 		endif;
@@ -324,10 +311,23 @@ jQuery(document).ready(function($) {
 		$instance['access_token'] = get_option('instagram-widget-access_token');
 		$hasaccesstoken = isset($instance['access_token']) && strlen($instance['access_token']) > 0;
 		
+		$client_id_error = false;
+		$client_secret_error = false;
+
 		if (!$instance['loggedout'] && isset($instance['redirecturi']) && 
-				!$hasaccesstoken && $_SERVER['REQUEST_METHOD'] == 'POST') {
-			?>
-			<script type="text/javascript">
+				!$hasaccesstoken && $_SERVER['REQUEST_METHOD'] == 'POST'):
+
+			if (strlen($instance['client_id']) != 32 || preg_match('[^0-9a-f]', $instance['client_id'])):
+				$client_id_error = true;
+			endif;
+
+			if (strlen($instance['client_secret']) != 32 || preg_match('[^0-9a-f]', $instance['client_secret'])):
+				$client_secret_error = true;
+			endif;
+
+			if (!$client_id_error && !$client_secret_error):
+			
+			?><script type="text/javascript">
 				var url = 'https://api.instagram.com/oauth/authorize/' 
 					+ '?redirect_uri=' + encodeURIComponent("<?php echo $instance['redirecturi']; ?>")
 					+ '&response_type=code' 
@@ -335,8 +335,11 @@ jQuery(document).ready(function($) {
 					+ '&display=touch';
 
 				window.open(url, 'wp-instagram-authentication-' + Math.random(), 'height=500,width=600');
-			</script>
-		<?php } ?>
+			</script><?php
+
+			endif;
+		endif; 
+		?>
 		<p>
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $instance['title']; ?>" class="widefat" />
@@ -374,10 +377,33 @@ jQuery(document).ready(function($) {
 		<p>
 			<label for="<?php echo $this->get_field_id('client_id'); ?>"><?php _e('Instagram client_id:', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id('client_id'); ?>" name="<?php echo $this->get_field_name('client_id'); ?>" type="text" value="<?php echo $instance['client_id'];?>" class="widefat" />
+
+			<?php if ($client_id_error): ?>
+				<div class="error">
+					Your client_id must be exactly 32 characters and 
+					only contain the characters 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, a, b, c, d, e and/or f.
+					You can find the client_id on 
+					<a href="http://instagram.com/developer/clients/manage/" target="_blank">
+						http://instagram.com/developer/clients/manage/
+					</a> if you registered a client previously. If not, please follow the instructions below
+				</div>
+			<?php endif; ?>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('client_secret'); ?>"><?php _e('Client_secret:', 'wpinstagram'); ?></label>
 			<input id="<?php echo $this->get_field_id('client_secret'); ?>" name="<?php echo $this->get_field_name('client_secret'); ?>" type="text" value="<?php echo $instance['client_secret'];?>" class="widefat" />
+
+			<?php if ($client_secret_error): ?>
+				<div class="error">
+					Your client_secret must be exactly 32 characters and 
+					only contain the characters 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, a, b, c, d, e and/or f.
+
+					You can find the client_secret on 
+					<a href="http://instagram.com/developer/clients/manage/" target="_blank">
+						http://instagram.com/developer/clients/manage/
+					</a> if you registered a client previously. If not, please follow the instructions below
+				</div>
+			<?php endif; ?>
 		</p>
 		<?php if(!isset($instance['access_token']) || strlen($instance['access_token']) == 0): ?>
 		<p>
