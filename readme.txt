@@ -118,7 +118,3 @@ Installation as usual.
 = 0.1.1 =
 * Initial upload to WordPress plugin directory
 
-== Upgrade Notice ==
-
-= 0.3 =
-After installation/update users will have to enter their Instagram login details (will be used only to get access token from Instagram and will not be saved or sent to someone else other than Instagram).
