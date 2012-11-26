@@ -18,3 +18,10 @@ ul.wpinstagram.centered {
 	margin: 0 auto !important;
 }
 
+#fancybox-img {
+	cursor: pointer;
+}
+
+#fancybox-left, #fancybox-right {
+	width: 15% !important;
+}

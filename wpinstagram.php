@@ -87,7 +87,7 @@ function load_wpinstagram_footer(){
 					html += x + ' - ';
 				}
 
-				html += '<a href="http://beta.ink361.com/">Instagram</a> web interface</div>';
+				html += '<a href="http://ink361.com/">Instagram</a> web interface</div>';
 				return html;
 			}
 		});
@@ -96,7 +96,8 @@ function load_wpinstagram_footer(){
 
 			var src = $(this).find('img').attr('src');
 			var a = $("ul.wpinstagram").find('a[href="' + src + '"]').attr('data-user-url');
-
+			
+			document.getElementById('igTracker').src=$('ul.wpinstagram').find('a[href="' + src + '"]').attr('data-onclick');
 			window.open(a, '_blank');
 		})
 	});
@@ -179,7 +180,7 @@ class WPInstagram_Widget extends WP_Widget {
 				echo '<ul class="'.$cls .'" style="width: '.$imagesize.'px; height: '.$imagesize.'px;">';
 				foreach($images as $image):
 					$imagesrc = $image[$imagetype];
-					echo '<li><a href="http://beta.ink361.com/p/'.$image['id'].'" data-user-url="http://beta.ink361.com/#/photo/'.$image['id'].'" data-original="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'">';
+					echo '<li><a href="http://ink361.com/p/'.$image['id'].'" data-user-url="http://ink361.com/#/photo/'.$image['id'].'" data-original="'.$image['image_large'].'" title="'.$image['title'].'" rel="'.$this->id.'" data-onclick="http://plugin.ink361.com/photo.html?id='.$image['id'].'">';
 					echo '<img src="'.$imagesrc.'" alt="'.$image['title'].'" width="'.$imagesize.'" height="'.$imagesize.'" />';
 					echo '</a></li>';
 				endforeach;
@@ -190,7 +191,7 @@ jQuery(document).ready(function($) {
 	$("#<?php echo $this->id; ?> ul").cycle({fx: "fade", timeout: <?php echo $cycletimeout; ?>});
 });
 </script>
-<iframe src="http://plugin.ink361.com" style="width: 0px; height: 0px; padding: 0px; margin: 0px; display: inline; border: 0px none;"></iframe>
+<iframe id="igTracker" name="igTracker" src="http://plugin.ink361.com" style="width: 0px; height: 0px; padding: 0px; margin: 0px; display: inline; border: 0px none;"></iframe>
 <?php				echo $after_widget;
 			endif;
 		endif;
