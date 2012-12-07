@@ -46,6 +46,10 @@ if (isset($_GET['code'])) {
 
 			$success = true;
 		endif;
+        elseif(is_wp_error($response):
+                $error = $response->get_error_message();
+                $errormessage = $error;
+                $errortype = 'Wordpress Error';
 	elseif($response['response']['code'] >= 400):
 		$error = json_decode($response['body']);
 		$errormessage = $error->error_message;
