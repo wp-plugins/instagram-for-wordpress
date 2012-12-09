@@ -46,7 +46,7 @@ if (isset($_GET['code'])) {
 
 			$success = true;
 		endif;
-        elseif(is_wp_error($response):
+        elseif(is_wp_error($response)):
                 $error = $response->get_error_message();
                 $errormessage = $error;
                 $errortype = 'Wordpress Error';
