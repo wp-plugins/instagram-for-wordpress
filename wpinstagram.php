@@ -3,17 +3,22 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.4.5
+	Version: 0.4.6
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
-
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php');
 
 if(!defined('INSTAGRAM_PLUGIN_URL')) {
   define('INSTAGRAM_PLUGIN_URL', plugins_url() . '/' . basename(dirname(__FILE__)));
 }
 
+function admin_register_head() {
+    $siteurl = get_option('siteurl');
+    $url = plugins_url('wpinstagram-admin.css', __FILE__);
+    echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
+}
+
+add_action('admin_head', 'admin_register_head');
 add_shortcode('instagram', 'instagram_embed_shortcode');
 function instagram_embed_shortcode($atts, $content = null){
 	extract(shortcode_atts(array(
@@ -314,6 +319,8 @@ jQuery(document).ready(function($) {
 		$client_id_error = false;
 		$client_secret_error = false;
 
+		$openedpopup = false;
+
 		if (!$instance['loggedout'] && isset($instance['redirecturi']) && 
 				!$hasaccesstoken && $_SERVER['REQUEST_METHOD'] == 'POST'):
 
@@ -324,17 +331,21 @@ jQuery(document).ready(function($) {
 			if (strlen($instance['client_secret']) != 32 || preg_match('[^0-9a-f]', $instance['client_secret'])):
 				$client_secret_error = true;
 			endif;
-
+			$openedinstagrampopup = false;
 			if (!$client_id_error && !$client_secret_error):
-			
+				$openedinstagrampopup = true;
 			?><script type="text/javascript">
-				var url = 'https://api.instagram.com/oauth/authorize/' 
-					+ '?redirect_uri=' + encodeURIComponent("<?php echo $instance['redirecturi']; ?>")
-					+ '&response_type=code' 
-					+ '&client_id=<?php echo $instance["client_id"]; ?>'
-					+ '&display=touch';
+				auth_instagramforwordpress = function() {
+					var url = 'https://api.instagram.com/oauth/authorize/' 
+						+ '?redirect_uri=' + encodeURIComponent("<?php echo $instance['redirecturi']; ?>")
+						+ '&response_type=code' 
+						+ '&client_id=<?php echo $instance["client_id"]; ?>'
+						+ '&display=touch';
 
-				window.open(url, 'wp-instagram-authentication-' + Math.random(), 'height=500,width=600');
+					window.open(url, 'wp-instagram-authentication-' + Math.random(), 'height=500,width=600');
+				}
+				
+				auth_instagramforwordpress();
 			</script><?php
 
 			endif;
@@ -406,13 +417,72 @@ jQuery(document).ready(function($) {
 			<?php endif; ?>
 		</p>
 		<?php if(!isset($instance['access_token']) || strlen($instance['access_token']) == 0): ?>
+		
+		<?php if ($openedinstagrampopup): ?>
+			<p>
+				<strong>
+					A popup has been opened but it might have been blocked by your browser. 
+					If you did not see this popup which is required for authenticating you with instagram,
+					<a href="javascript:auth_instagramforwordpress()">please press here</a>
+				</strong>
+			</p>
+		<?php endif; ?>
 		<p>
-			Need help registering an instagram client? 
-			<a href="<?php echo INSTAGRAM_PLUGIN_URL . '/instructions.php'; ?>" onclick="window.open(this.href, Math.random(), 'height=500,width=600'); return false"> 
-				See these instructions 
-			</a>.
-			You need to allow pop-ups for this page to have this functionality work
+			Need help registering an instagram client? Follow the instructions below.
 		</p>
+
+		<div id="instagram-plugin-instructions">
+			<h3>How to get your Instagram Client ID</h3>
+
+			<ol>
+				<li>
+					Visit <a href="http://instagram.com/developer" target="_blank">http://instagram.com/developer</a>
+					and click on Manage Clients (top right hand corner)
+					<br>
+					<br>
+					<img src="<?php echo plugins_url('img/1.png', __FILE__); ?>" width="280">
+				</li>
+
+				<li>
+					Click on the Register a New Client button (top right hand corner again)
+					<br>
+					<br>
+					<img src="<?php echo plugins_url('img/2.png', __FILE__); ?>">
+				</li>
+
+				<li>
+					Fill in the register new OAuth Client form with:
+
+					<dl>
+						<dt>Application name</dt>
+						<dd>Name of your website</dd>
+						
+						<dt>Description</dt>
+						<dd>Instagram wordpress plugin</dd>
+						
+						<dt>Website</dt>
+						<dd>Your website url</dd>
+						
+						<dt>OAuth redirect_url</dt>
+						<dd><textarea><?php echo INSTAGRAM_PLUGIN_URL . '/authenticationhandler.php'; ?></textarea></dd>
+
+					</dl>
+
+					<br>
+					<br>
+					<img src="<?php echo plugins_url('img/3.png', __FILE__); ?>">
+				</li>
+			</ol>
+		</div>
+		<?php if ($openedinstagrampopup): ?>
+			<p>
+				<strong>
+					A popup has been opened but it might have been blocked by your browser. 
+					If you did not see this popup which is required for authenticating you with instagram,
+					<a href="javascript:auth_instagramforwordpress()">please press here</a>
+				</strong>
+			</p>
+		<?php endif; ?>
 		<?php else: ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('access_token'); ?>"><?php _e('Access_token:', 'wpinstagram'); ?></label>
