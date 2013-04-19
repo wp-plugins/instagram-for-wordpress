@@ -3,7 +3,7 @@ Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.5.1
-Stable tag: 0.4.6
+Stable tag: 0.4.7
 
 Simple sidebar widget that shows Your latest instagr.am pictures and picture embedder.
 
@@ -34,6 +34,9 @@ Installation as usual.
 6. Change title of widget to what ever You like.
 
 == Changelog ==
+
+= 0.4.7 = 
+* added local caching to prevent the instagram api from denying requests
 
 = 0.4.6 = 
 * removed some nasty code

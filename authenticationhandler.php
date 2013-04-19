@@ -10,7 +10,7 @@ if (isset($_GET['code'])) {
 
 	$client_id = get_option('instagram-widget-client_id');
 	$client_secret = get_option('instagram-widget-client_secret');
-
+ 
 	$response = wp_remote_post("https://api.instagram.com/oauth/access_token",
 		array(
 			'body' => array(

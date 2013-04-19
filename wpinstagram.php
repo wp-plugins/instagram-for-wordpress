@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
-	Version: 0.4.6
+	Version: 0.4.7
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
@@ -15,11 +15,12 @@ if(!defined('INSTAGRAM_PLUGIN_URL')) {
 function admin_register_head() {
     $siteurl = get_option('siteurl');
     $url = plugins_url('wpinstagram-admin.css', __FILE__);
-    echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
+    wp_enqueue_style('wpinstagram-admin.css', $url);
 }
 
 add_action('admin_head', 'admin_register_head');
 add_shortcode('instagram', 'instagram_embed_shortcode');
+
 function instagram_embed_shortcode($atts, $content = null){
 	extract(shortcode_atts(array(
 		'url' => '',
@@ -61,6 +62,7 @@ add_option('instagram-widget-access_token', null, false, true);
 add_option('instagram-widget-username', null, false, false);
 add_option('instagram-widget-picture', null, false, false);
 add_option('instagram-widget-fullname', null, false, false);
+add_option('instagram-widget-cache', null, false, false);
 
 function load_wpinstagram() {
 	register_widget('WPInstagram_Widget');
@@ -141,12 +143,36 @@ class WPInstagram_Widget extends WP_Widget {
 		$instance['access_token'] = get_option('instagram-widget-access_token');
 		$instance['client_id'] = get_option('instagram-widget-client_id');
 		$instance['client_secret'] = get_option('instagram-widget-client_secret');
+
+
 		if(isset($instance['access_token'])):
 			$images = wp_cache_get($this->id, 'wpinstagram_cache');
 			if(false == $images):
-				$images = $this->instagram_get_latest($instance);
-				wp_cache_set($this->id, $images, 'wpinstagram_cache', $cacheduration);
+				$imageraw = get_option('instagram-widget-cache');
+				
+				if ($imageraw) {
+					$imageraw = unserialize(base64_decode($imageraw));
+					
+					if (($imageraw['created'] + $cacheduration) > time()) {
+						$images = $imageraw['data'];
+					}
+				}
+
+				if (false == $images) {
+					$images = $this->instagram_get_latest($instance);
+					wp_cache_set($this->id, $images, 'wpinstagram_cache', $cacheduration);
+
+					$tocache = array(
+						'created' => time(),
+						'data' => $images
+					);
+					
+					update_option('instagram-widget-cache', base64_encode(serialize($tocache)));
+				}
 			endif;
+
+			//var_dump($images);
+
 			if(!empty($images)):
 				echo $before_widget;
 				if($title):
