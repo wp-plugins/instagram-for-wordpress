@@ -2,7 +2,7 @@
 /*
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
-	Description: Simple sidebar widget that shows Your latest 20 instagr.am pictures and picture embedder.
+	Description: Comprehensive Instagram sidebar widget with many options.
 	Version: 1.0.0
 	Author: jbenders
 	Author URI: http://ink361.com/
@@ -140,10 +140,13 @@ class WPInstagram_Widget extends WP_Widget {
 		#have we got a cache?
 		$cached = json_decode(get_option($this->id . 'result_cache'), true);
 		$cache_time = get_option($this->id . 'cache_time');
+		$shown = false;
 		
 		if ($cached && $cache_time && $cache_time > (time() - 3600)) {
-			$this->_display_results($cached, $settings, true);
-		} else {		
+			$shown = $this->_display_results($cached, $settings, true);
+		}
+
+		if (!$shown) {
 			#what display type
 			if ($settings['display'] == 'self') {
 				#our own pictures
@@ -377,7 +380,11 @@ class WPInstagram_Widget extends WP_Widget {
 			require(plugin_dir_path(__FILE__) . 'templates/slideshow.php');										
 		}
 		
-		return true;
+		if (sizeof($images) > 0) {		
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	function update($new_instance, $old_instance){
