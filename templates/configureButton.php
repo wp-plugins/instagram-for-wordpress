@@ -9,7 +9,7 @@
 
   function openConfigure<?php print $instance['token'] ?>() {
     window._lbox = lightbox({
-      content : '<iframe src="http://wordpress.ink361.com/config/<?php print $instance['token'] ?>"></iframe>',
+      content : '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/config/<?php print $instance['token'] ?>"></iframe>',
       frameCls : '',
       closeCallback: function() {
         refreshWidget<?php print $instance['token'] ?>();
@@ -20,7 +20,7 @@
   function detectPayment<?php print $instance['token'] ?>() {
     if (location.href.replace('auth=', '') != location.href && !completedAction) {
       window._lbox = lightbox({
-        content : '<iframe src="http://wordpress.ink361.com/setup/<?php print $instance['token'] ?>"></iframe>',
+        content : '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/setup/<?php print $instance['token'] ?>"></iframe>',
         frameCls : '',
         closeCallback: function() {
           refreshWidget<?php print $instance['token'] ?>();
@@ -33,7 +33,7 @@
   function detectUpgrade<?php print $instance['token'] ?>() {
     if (location.href.replace('upgraded=<?php print $instance['token'] ?>', '') != location.href && !completedAction) {
       window._lbox = lightbox({
-        content : '<iframe src="http://wordpress.ink361.com/config/<?php print $instance['token'] ?>/subscription?waiting=1"></iframe>',
+        content : '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/config/<?php print $instance['token'] ?>/subscription?waiting=1"></iframe>',
         frameCls : '',
         closeCallback: function() {
           refreshWidget<?php print $instance['token'] ?>();
@@ -56,7 +56,7 @@
       var token = '<?php print $instance['token'] ?>';
       if (location.href.replace('widget=' + token, '') != location.href) {
         window._lbox = lightbox({
-          content: '<iframe src="http://wordpress.ink361.com/setup?widget=<?php print $instance['token'] ?>&step=2"></iframe>',
+          content: '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/setup?widget=<?php print $instance['token'] ?>&step=2"></iframe>',
           frameCls: '',
           closeCallback: function() {
             refreshWidget<?php print $instance['token'] ?>();

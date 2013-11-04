@@ -3,7 +3,7 @@
 <script>
   function openSetup<?php print $instance['token'] ?>() {      
     lightbox({
-      content : '<iframe src="http://wordpress.ink361.com/setup?widget=<?php print $instance['token'] ?>&referring=' + escape(location.href) + '"></iframe>',
+      content : '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/setup?widget=<?php print $instance['token'] ?>&referring=' + escape(location.href) + '"></iframe>',
       frameCls : '',
       closeCallback: function() {
         jQuery('#setupButton<?php print $instance['token'] ?>').parent().parent().find('input[type=submit]').click();      
@@ -14,7 +14,7 @@
   function detectPayment<?php print $instance['token'] ?>() {
     if (location.href.replace('auth=', '') != location.href || location.href.replace('wpInstall=', '') != location.href) {
       window._lbox = lightbox({
-        content : '<iframe src="http://wordpress.ink361.com/setup/<?php print $instance['token'] ?>"></iframe>',
+        content : '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/setup/<?php print $instance['token'] ?>"></iframe>',
         frameCls : '',
         closeCallback: function() {
           refreshWidget<?php print $instance['token'] ?>();
@@ -40,11 +40,11 @@
       var token = '<?php print $instance['token'] ?>';
       if (location.href.replace('widget=' + token, '') != location.href) {
         window._lbox = lightbox({
-          content: '<iframe src="http://wordpress.ink361.com/setup?widget=<?php print $instance['token'] ?>&step=2"></iframe>',
+          content: '<iframe frameborder="0" border="0" src="http://wordpress.ink361.com/setup?widget=<?php print $instance['token'] ?>&step=2"></iframe>',
           frameCls: '',
           closeCallback: function() {
             refreshWidget<?php print $instance['token'] ?>();
-          },
+          }
         });
       }
     <?php
