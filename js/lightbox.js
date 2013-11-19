@@ -1,13 +1,3 @@
-/*
- * Ink361 Ltd Lightbox Class v1.0.1
- * http://ink361.com
- *
- * Copyright 2013 Ink361 Ltd
- * Released under the following license: http://ink361.com/static/html/license.html
- *
- * Date 2013-03-11
-*/
-
 function lightbox(lparams) {
 	var lbox = {};
 	lbox.params = lparams;

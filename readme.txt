@@ -39,6 +39,7 @@ Installation as usual.
 * Message alerting users to why the plugin uses the INK361 Instagram service
 * Removal of paid version (refund given to every user who purchased)
 * Free version now contains all of the features in the paid version
+* Removal of incorrect license on lightbox.js
 
 = 1.0.2 =
 * Fixes for IE
