@@ -24,7 +24,7 @@
   $imageHeight = $imageWidth;
 ?>
   
-<ul class="wpinstagram wpinstagram-slideshow <?php if ($settings['is_paid']) { print "live"; } ?>" style="width: <?php print $width ?>px; height: <?php print $width ?>px;">
+<ul class="wpinstagram wpinstagram-slideshow live" style="width: <?php print $width ?>px; height: <?php print $width ?>px;">
   <?php
     foreach ($images as $image) {
     
@@ -40,21 +40,11 @@
   ?>  
     <li style="width: <?php print $imageWidth ?>px; height: <?php print $imageHeight ?>px; margin-bottom: <?php print $padding ?>px !important;">
       <a class="mainI" href="http://ink361.com/app/photo/ig-<?php print $image['id'] ?>"
-         <?php
-          if ($settings['is_paid']) {
-         ?>
          data-user-url="http://ink361.com/app/photo/ig-<?php print $image['id'] ?>"
          data-original="<?php print $image['image_large'] ?>"
          title="<?php print $image['title'] ?>"
          rel="<?php print $image['id'] ?>"
          data-onclick="http://ink361/com/app/photo/ig-<?php print $image['id'] ?>"
-         <?php
-          } else {
-         ?>
-          target="_blank"
-         <?php
-          }
-         ?>
          >
          
          <img src="<?php print $url ?>" style="width: <?php print $imageWidth ?>px; height: <?php print $imageHeight ?>px; margin-bottom: <?php print $padding ?>px;">

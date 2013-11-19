@@ -72,3 +72,5 @@
     ?>
   });
 </script>
+
+<?php include("message.php"); ?>

@@ -91,6 +91,8 @@
 .simpleSetupButton {
 	width: 100%;
 	text-align: center;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
 	margin: 5px 0px 10px 0px !important;
 }
 
