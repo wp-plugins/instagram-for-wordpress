@@ -3,7 +3,7 @@ Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 3.6.1
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 
 A comprehensive sidebar widget that can show your latest photos, tagged
 photos, your favourite photos, your feed, other users photos. Can be shown
@@ -34,6 +34,9 @@ Installation as usual.
 5. Enjoy!
 
 == Changelog ==
+
+= 1.0.4 =
+* Addition of missing before and after widget variables
 
 = 1.0.3 =
 * Message alerting users to why the plugin uses the INK361 Instagram service
