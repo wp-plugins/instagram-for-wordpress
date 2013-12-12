@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Comprehensive Instagram sidebar widget with many options.
-	Version: 1.0.4
+	Version: 1.0.5
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
@@ -72,7 +72,7 @@ function load_wpinstagram_footer(){
 }
 
 class WPInstagram_Widget extends WP_Widget {
-	function WPInstagram_Widget($args){
+	function WPInstagram_Widget($args=array()){
 		$width = '220';
 		$height = '220';
 	
