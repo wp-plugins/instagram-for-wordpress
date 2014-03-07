@@ -2,8 +2,8 @@
 Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
-Tested up to: 3.6.1
-Stable tag: 1.0.5
+Tested up to: 3.8.1
+Stable tag: 1.0.6
 
 A comprehensive sidebar widget that can show your latest photos, tagged
 photos, your favourite photos, your feed, other users photos. Can be shown
@@ -34,6 +34,9 @@ Installation as usual.
 5. Enjoy!
 
 == Changelog ==
+
+= 1.0.6 = 
+* Fix for poor error responses returned from widget service.
 
 = 1.0.5 =
 * Fix for bad plugin instantiation from widgets.php
