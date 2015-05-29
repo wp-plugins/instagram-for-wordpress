@@ -3,7 +3,7 @@ Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 4.2.2
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 
 A comprehensive sidebar widget that can show your latest photos, tagged
 photos, your favourite photos, your feed, other users photos. Can be shown
@@ -45,6 +45,12 @@ For more installation options please refer to
 http://wordpress.ink361.com/help/installing
 
 == Changelog ==
+
+= 2.0.3 =
+* Fixed image quality problem on slideshow.
+* Added cumulative and restrictive option on tagged photos display.
+* Added custom titles to widget configuration to allow easy identification of widgets.
+* Fixed configuration lightbox in Customizer
 
 = 2.0.2 =
 * Fixed an issue with the database table checking method
