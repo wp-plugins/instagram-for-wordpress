@@ -719,7 +719,7 @@
       }   
       
       //customise with our title
-      customiseTitle<?php print $instance['db_id'] ?>('<?php print $customTitle ?>');     
+      customiseTitle<?php print $instance['db_id'] ?>('<?php print $customTitle ?>');
     });
   </script>
 <?php
