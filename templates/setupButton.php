@@ -471,7 +471,7 @@
       //our dropdown search
       jQuery('#otherUser').keyup(function(event) {
         setTimeout(function() {
-          searchUserHandler();
+          searchUserHandler<?php print $instance['db_id'] ?>();
         }, 200);
       });
       jQuery('#otherUser').blur(function(event) {
@@ -671,8 +671,8 @@
         }, 100);
       }
     
-      if (!window.searchUserHandler) {
-        window.searchUserHandler = function() {
+      if (!window.searchUserHandler<?php print $instance['db_id'] ?>) {
+        window.searchUserHandler<?php print $instance['db_id'] ?> = function() {
           var keywords = jQuery('#otherUser').val();
                  
           if (keywords.length > 2) {
