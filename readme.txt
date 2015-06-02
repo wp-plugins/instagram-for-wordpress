@@ -45,6 +45,10 @@ http://wordpress.ink361.com/help/installing
 
 == Changelog ==
 
+= 2.0.5 =
+* Fix for warnings on line 32 of the plugin.
+* Removed DateTime dependency.
+
 = 2.0.4 =
 * Added configuration guide notifications to make installation easier.
 

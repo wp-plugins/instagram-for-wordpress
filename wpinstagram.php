@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Comprehensive Instagram sidebar widget with many options.
-	Version: 2.0.4
+	Version: 2.0.5
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
@@ -29,7 +29,7 @@ function load_wpinstagram() {
 function wpinstagram_show_instructions() {
 	global $wpdb;
 	
-	$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM igwidget_widget"));
+	$results = $wpdb->get_results("SELECT * FROM igwidget_widget");
 	
 	if (sizeof($results) == 0) {	
 		$url = plugins_url('wpinstagram-admin.css', __FILE__); 
@@ -150,20 +150,20 @@ class WPInstagram_Widget extends WP_Widget {
 				
 				#is our cache valid
 				if ($details->cache_time !== NULL && $details->cache_time !== '') {				
-					$time = DateTime::createFromFormat('Y-m-d H:i:s', $details->cache_time);
+					$time = strtotime($details->cache_time);
 					
 					#need to get it from the DB as it may run on a different timezone setting
 					$fromDB = $wpdb->get_results("SELECT NOW() as dbtime");
 					
-					$now = DateTime::createFromFormat('Y-m-d H:i:s', $fromDB[0]->dbtime);
+					$now = strtotime($fromDB[0]->dbtime);										
 					
-					$interval = new DateInterval('PT' . $this->_defaultCacheTime() . 'S');
+					$interval = $this->_defaultCacheTime();
 					
 					if ($details->cache_timeout !== NULL && $details->cache_timeout !== '') {
-						$interval = new DateInterval('PT' . $details->cache_timeout . 'S');
-					}
-
-					if ($time->add($interval) > $now) {
+						$interval = $details->cache_timeout;
+					}					
+					
+					if ($time + $interval > $now) {
 						#cache time is valid, confirm cached value matches what we expect
 						if ($details->result_cache !== NULL && $details->result_cache !== '') {
 							$cached = json_decode($details->result_cache, true);
