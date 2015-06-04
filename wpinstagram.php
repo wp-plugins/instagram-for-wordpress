@@ -3,7 +3,7 @@
 	Plugin Name: Instagram for Wordpress
 	Plugin URI: http://wordpress.org/extend/plugins/instagram-for-wordpress/
 	Description: Comprehensive Instagram sidebar widget with many options.
-	Version: 2.0.5
+	Version: 2.0.6
 	Author: jbenders
 	Author URI: http://ink361.com/
 */
@@ -38,6 +38,35 @@ function wpinstagram_show_instructions() {
 		wp_enqueue_script("lightbox", plugin_dir_url(__FILE__)."js/lightbox.js", Array('jquery'), null);
 		
 		require(plugin_dir_path(__FILE__) . 'templates/setupInstructions.php');		
+	} else {
+		$settings = $wpdb->get_results("SELECT * FROM igwidget_global_settings WHERE name='firstRun' and value <= DATE_SUB(now(), INTERVAL 7 DAY)");
+		
+		if (sizeof($settings) == 0) {
+			#has it been set yet?
+			$check = $wpdb->get_results("SELECT * FROM igwidget_global_settings WHERE name='firstRun'");
+			if (sizeof($check) == 0) {				
+				#create it
+				$wpdb->get_results("INSERT INTO igwidget_global_settings (name, value) VALUES ('firstRun', NOW())");
+			}
+		} else {
+			#have we been disabled?
+			$disabled = $wpdb->get_results("SELECT * FROM igwidget_global_settings WHERE name='disabledMessage'");
+			
+			if (sizeof($disabled) == 0) {	
+				#have we received a request to remove the message?								
+				if (isset($_POST['instagram_widget_disable_message']) || isset($_GET['instagram_widget_disable_message'])) {
+					$wpdb->get_results("INSERT INTO igwidget_global_settings (name, value) VALUES ('disabledMessage', '1')");
+				} else {						
+					#need to show header
+					$url = plugins_url('wpinstagram-admin.css', __FILE__); 
+					wp_enqueue_style('wpinstagram-admin.css', $url);
+					wp_enqueue_script("jquery");
+					wp_enqueue_script("lightbox", plugin_dir_url(__FILE__)."js/lightbox.js", Array('jquery'), null);
+					
+					require(plugin_dir_path(__FILE__) . 'templates/reviewInstructions.php');					
+				}				
+			}	
+		}
 	}
 }
 
@@ -178,23 +207,25 @@ class WPInstagram_Widget extends WP_Widget {
 				}
 		
 				if ($details->token && $details->token !== '') {
-					if ($details->settings['display'] == 'self') {
+					if ($details->settings['display'] === 'self') {
 						$this->_display_user('self', $details);					
-					} else if ($details->settings['display'] == 'likes') {
+					} else if ($details->settings['display'] === 'likes') {
 						$this->_display_likes($details);
-					} else if ($details->settings['display'] == 'feed') {
+					} else if ($details->settings['display'] === 'feed') {
 						$this->_display_feed($details);
-					} else if ($details->settings['display'] == 'popular') {
+					} else if ($details->settings['display'] === 'popular') {
 						$this->_display_popular($details);					
-					} else if ($details->settings['display'] == 'user') {
+					} else if ($details->settings['display'] === 'user') {
 						$this->_display_user($details->settings['user'], $details);
-					} else if ($details->settings['display'] == 'tags') {
+					} else if ($details->settings['display'] === 'tags') {
 						$this->_display_tags($details->settings['tag1'], 
 								     $details->settings['tag2'], 
 								     $details->settings['tag3'], 
 								     $details->settings['tag4'], 
 									 $details->settings['tagCompare'],
 								     $details);
+					} else if ($details->settings['display'] === 'location') {
+						$this->_display_location($details->settings['latitude'], $details->settings['longitude'], $details);
 					}
 				}				
 			}
@@ -261,25 +292,28 @@ class WPInstagram_Widget extends WP_Widget {
 		#compile our settings if we have them
 		if ($_POST['title']) { #we always have our title
 			$settings = array(
-				"title"		=> stripslashes($_POST['title']),
-				"user"		=> $_POST['user'],
-				"username" 	=> stripslashes($_POST['username']),
-				"tag1"		=> stripslashes($_POST['tag1']),
-				"tag2"		=> stripslashes($_POST['tag2']),
-				"tag3"		=> stripslashes($_POST['tag3']),
-				"tag4"		=> stripslashes($_POST['tag4']),
-				"tagCompare"=> stripslashes($_POST['tagCompare']),
-				"width"		=> stripslashes($_POST['width']),
-				"height"	=> stripslashes($_POST['height']),
-				"delay"		=> stripslashes($_POST['delay']),
-				"display"	=> $_POST['display'],
-				"method"	=> $_POST['method'],
-				"cols"		=> $_POST['cols'],
-				"rows"		=> $_POST['rows'],
+				"title"			=> stripslashes($_POST['title']),
+				"user"			=> $_POST['user'],
+				"username" 		=> stripslashes($_POST['username']),
+				"tag1"			=> stripslashes($_POST['tag1']),
+				"tag2"			=> stripslashes($_POST['tag2']),
+				"tag3"			=> stripslashes($_POST['tag3']),
+				"tag4"			=> stripslashes($_POST['tag4']),
+				"tagCompare"	=> stripslashes($_POST['tagCompare']),
+				"width"			=> stripslashes($_POST['width']),
+				"height"		=> stripslashes($_POST['height']),
+				"delay"			=> stripslashes($_POST['delay']),
+				"display"		=> $_POST['display'],
+				"method"		=> $_POST['method'],
+				"cols"			=> $_POST['cols'],
+				"rows"			=> $_POST['rows'],
 				"transition"	=> $_POST['transition'],
 				"responsive"	=> $_POST['responsive'],
-				"sharing"	=> $_POST['sharing'],
-				"verbose"	=> $_POST['verbose'],
+				"sharing"		=> $_POST['sharing'],
+				"verbose"		=> $_POST['verbose'],
+				"location"		=> stripslashes($_POST['location']),
+				"latitude"		=> stripslashes($_POST['latitude']),
+				"longitude"		=> stripslashes($_POST['longitude']),
 			);
 			
 			$cacheTimeout = NULL;
@@ -292,6 +326,45 @@ class WPInstagram_Widget extends WP_Widget {
 		
 		return $instance;
 	}
+	
+	function _display_location($latitude, $longitude, $settings) {
+		$images = array();
+
+		if ($settings->token) {						
+			$url = "https://api.instagram.com/v1/media/search?count=50&distance=5000&lat=" . $latitude . "&lng=" . $longitude . "&access_token=" . $settings->token;						
+			
+			$response = wp_remote_get($url, array('sslverify' => apply_filters('https_local_ssl_verify', false)));
+			if (!is_wp_error($response) && $response['response']['code'] < 400 && $response['response']['code'] >= 200) {
+				$data = json_decode($response['body'], true);
+								
+				if ($data['meta']['code'] == 200) {
+					foreach ($data['data'] as $item) {
+						if (isset($item['caption']['text'])) {
+							$image_title = '@' . $item['user']['username'] . ': "' . filter_var($item['caption']['text'], FILTER_SANITIZE_STRING) . '"';
+						} else if (!isset($item['caption']['text'])) {
+							$image_title = "Instagram by @" . $item['user']['username'];
+						}
+						
+						$images[] = array(
+							"id"		=> $item['id'],
+							"title"		=> $image_title,
+							"parsedtitle"	=> $this->_parse_title($image_title),
+							"user"		=> $item['user']['id'],
+							"username"	=> $item['user']['username'],
+							"image_small"	=> $item['images']['thumbnail']['url'],
+							"image_middle"	=> $item['images']['low_resolution']['url'],
+							"image_large"	=> $item['images']['standard_resolution']['url'],
+						);
+					}
+				}							
+			} else {
+				$this->_handle_error_response($response, $settings);
+				return;
+			}			
+		}
+		
+		return $this->_display_results($images, $settings, false);
+	}		
         
 	function _display_popular($settings) {
 		$images = array();
@@ -704,6 +777,22 @@ class WPInstagram_Widget extends WP_Widget {
 					'null'	=> true,
 				),
 			),
+			$this->_tablePrefix() . 'global_settings' => array(
+				'uid'	=> array(
+					'type' 	=> 'int(11)',
+					'null' 	=> false,
+					'pk' 	=> true,
+					'auto'	=> true,
+				),
+				'name'	=> array(
+					'type'	=> 'varchar(255)',
+					'null'	=> true,
+				),
+				'value'	=> array(
+					'type'	=> 'text',
+					'null'	=> true,	
+				),
+			),
 		);
 	}
 	
@@ -905,6 +994,24 @@ class WPInstagram_Widget extends WP_Widget {
 		
 		if (!array_key_exists("verbose", $settings)	|| $settings['verbose'] === '') {
 			$settings['verbose'] = 'yes';
+		}
+		
+		if (!array_key_exists("location", $settings)) {
+			$settings['location'] = '';
+			$settings['latitude'] = '';
+			$settings['longitude'] = '';
+		}
+		
+		if (!array_key_exists('latitude', $settings)) {
+			$settings['location'] = '';
+			$settings['latitude'] = '';
+			$settings['longitude'] = '';
+		}
+		
+		if (!array_key_exists('longitude', $settings)) {
+			$settings['location'] = '';
+			$settings['latitude'] = '';
+			$settings['longitude'] = '';			
 		}
 		
 		return $settings;
