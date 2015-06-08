@@ -3,7 +3,7 @@ Contributors: jbenders
 Tags: widgets, photos, instagram
 Requires at least: 3.0
 Tested up to: 4.2.2
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 
 A comprehensive sidebar widget that can show your latest photos, tagged
 photos, photos from a location, your favourite photos, your feed, other users photos. Can be shown
@@ -44,6 +44,13 @@ For more installation options please refer to
 http://wordpress.ink361.com/help/installing
 
 == Changelog ==
+
+= 2.0.7 =
+* Fixed javascript conflicts in admin.
+* Fixed alignment of close button on fancybox lightbox
+* Added on-hover visible captions on fancybox
+* Improved review bar visibility by removing it from all admin pages apart from plugins/widgets
+* Added error message when database restrictions stop widget from functioning
 
 = 2.0.6 =
 * Added new location method to show images from a specific location.

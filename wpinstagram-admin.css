@@ -552,3 +552,14 @@ li.tabber.error a {
 	text-decoration: none;
 	color: #FFF;
 }
+
+.instagram_setup_instructions p.code {
+	padding: 10px;
+	background: #DDD;
+	border: 1px solid #D1D1D1;
+	border-radius: 4px;	
+	display: block;
+	width: 480px;
+	height: 250px;
+	overflow: auto;	
+}
